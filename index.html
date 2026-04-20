@@ -1,188 +1,940 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Painel Executivo · Limpeza Escolar</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Painel Executivo · Limpeza Escolar</title>
+  <style>
+    :root {
+      --bg: #061a2d;
+      --bg-2: #082544;
+      --bg-3: #0b3158;
+      --card: rgba(8, 33, 58, 0.92);
+      --line: rgba(79, 195, 247, 0.18);
+      --text: #f4f8fc;
+      --muted: #9fb5c9;
+      --blue: #3bb8ff;
+      --cyan: #4de0ff;
+      --green: #00d084;
+      --orange: #ff9b2f;
+      --red: #ff5f5f;
+      --yellow: #ffc857;
+      --shadow: 0 10px 30px rgba(0,0,0,.30);
+      --radius: 20px;
+    }
 
-<style>
-body {
-  margin: 0;
-  font-family: "Segoe UI", sans-serif;
-  background: linear-gradient(180deg, #081c34, #0b2a4d);
-  color: #fff;
-}
+    * { box-sizing: border-box; }
 
-.container {
-  padding: 25px;
-}
+    body {
+      margin: 0;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(59,184,255,.10), transparent 25%),
+        linear-gradient(180deg, #041221 0%, #061a2d 40%, #04111d 100%);
+      color: var(--text);
+    }
 
-.titulo {
-  font-size: 22px;
-  font-weight: 600;
-}
+    .page {
+      max-width: 1540px;
+      margin: 0 auto;
+      padding: 28px 28px 40px;
+    }
 
-.subtitulo {
-  font-size: 14px;
-  color: #8aa4c7;
-  margin-bottom: 20px;
-}
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
 
-.filtros {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
+    .title-wrap h1 {
+      margin: 0;
+      font-size: 30px;
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: .2px;
+    }
 
-.filtro {
-  background: #0f2f5c;
-  padding: 10px 15px;
-  border-radius: 8px;
-}
+    .title-wrap h2 {
+      margin: 8px 0 0;
+      font-size: 18px;
+      color: #dce8f4;
+      font-weight: 600;
+    }
 
-.kpis {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 15px;
-}
+    .title-wrap p {
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
 
-.card {
-  background: linear-gradient(145deg, #0d2f57, #0a2445);
-  padding: 15px;
-  border-radius: 12px;
-}
+    .brand {
+      min-width: 220px;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+    }
 
-.card h3 {
-  margin: 0;
-  font-size: 12px;
-  color: #8aa4c7;
-}
+    .panel, .card, .table-card, .chart-card, .heat-card {
+      background: linear-gradient(180deg, rgba(6,29,52,.96), rgba(4,22,39,.96));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
 
-.card p {
-  margin: 5px 0 0;
-  font-size: 20px;
-  font-weight: bold;
-}
+    .filters {
+      display: grid;
+      grid-template-columns: 150px 150px 180px 210px 1fr;
+      gap: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
 
-.verde { color: #3be28a; }
-.vermelho { color: #ff5c5c; }
+    .filter {
+      background: rgba(8, 35, 60, .95);
+      border: 1px solid rgba(59,184,255,.22);
+      border-radius: 14px;
+      padding: 10px 14px;
+      min-height: 62px;
+    }
 
-.bloco {
-  margin-top: 30px;
-  background: #0f2f5c;
-  border-radius: 12px;
-  padding: 20px;
-}
+    .filter label {
+      display: block;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.6px;
+      color: #8db0c8;
+      margin-bottom: 6px;
+      font-weight: 700;
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-}
+    .filter select {
+      width: 100%;
+      background: transparent;
+      color: var(--text);
+      border: none;
+      outline: none;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-th, td {
-  padding: 10px;
-  text-align: left;
-}
+    .filter select option {
+      color: #111;
+    }
 
-th {
-  color: #8aa4c7;
-  border-bottom: 1px solid #1f4b82;
-}
+    .view-tag {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10px 16px;
+      font-weight: 800;
+      font-size: 16px;
+      color: #ffe9d2;
+      background: linear-gradient(180deg, rgba(255,155,47,.20), rgba(255,155,47,.08));
+      border: 1px solid rgba(255,155,47,.45);
+      border-radius: 14px;
+    }
 
-tr:hover {
-  background: #153a6b;
-}
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 12px;
+      margin-bottom: 14px;
+    }
 
-</style>
+    .card {
+      padding: 16px 16px 14px;
+      min-height: 132px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, rgba(255,255,255,0), var(--accent, var(--blue)), rgba(255,255,255,0));
+    }
+
+    .card-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.8px;
+      color: #91adc3;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 19px;
+      font-weight: 900;
+      margin-bottom: 8px;
+      line-height: 1.1;
+    }
+
+    .card-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      background: rgba(255,255,255,.07);
+      color: white;
+    }
+
+    .chip-green { background: rgba(0,208,132,.18); color: #8dffc9; }
+    .chip-orange { background: rgba(255,155,47,.18); color: #ffd4a6; }
+    .chip-red { background: rgba(255,95,95,.18); color: #ffc0c0; }
+    .chip-blue { background: rgba(59,184,255,.18); color: #b8ebff; }
+
+    .card-note {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.35;
+    }
+
+    .top-grid {
+      display: grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .panel {
+      padding: 18px;
+    }
+
+    .section-title {
+      margin: 0 0 14px;
+      font-size: 15px;
+      letter-spacing: 1.8px;
+      text-transform: uppercase;
+      font-weight: 900;
+    }
+
+    .method-tabs, .metric-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .tab {
+      border: 1px solid rgba(59,184,255,.22);
+      background: rgba(11,39,67,.9);
+      color: #d9e8f7;
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      border-color: rgba(255,155,47,.55);
+      color: #ffd6ab;
+      box-shadow: inset 0 0 0 1px rgba(255,155,47,.15);
+    }
+
+    .method-highlight {
+      border-top: 3px solid var(--cyan);
+      padding-top: 16px;
+      min-height: 190px;
+    }
+
+    .method-kpi-title {
+      color: #8fc0dd;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      margin-bottom: 12px;
+    }
+
+    .method-kpi-value {
+      font-size: 50px;
+      font-weight: 900;
+      line-height: 1;
+      margin-bottom: 12px;
+    }
+
+    .method-kpi-foot {
+      margin-top: 10px;
+      color: #d3e4f3;
+      font-size: 15px;
+    }
+
+    .method-kpi-sub {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+      line-height: 1.4;
+    }
+
+    .summary-list {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .mini-box {
+      padding: 14px;
+      border-radius: 14px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(255,255,255,.07);
+    }
+
+    .mini-box .k {
+      color: #87a5bc;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      margin-bottom: 6px;
+    }
+
+    .mini-box .v {
+      font-size: 23px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .mini-box .s {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .mid-grid {
+      display: grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+
+    .table-card, .chart-card, .heat-card {
+      padding: 18px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+
+    th, td {
+      padding: 12px 8px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      text-align: left;
+    }
+
+    th {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1.7px;
+      color: #95afc3;
+    }
+
+    td strong { font-weight: 900; }
+
+    .chart-area {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 18px;
+      height: 260px;
+      padding: 28px 8px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+
+    .bar-col {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: end;
+      gap: 10px;
+    }
+
+    .bar-label-top {
+      font-size: 13px;
+      color: #ebf5ff;
+      font-weight: 700;
+    }
+
+    .bar {
+      width: 40px;
+      border-radius: 14px 14px 0 0;
+      background: linear-gradient(180deg, #ff9b2f, #bf6500);
+      border: 1px solid rgba(255,200,140,.35);
+      box-shadow: 0 8px 20px rgba(255,155,47,.18);
+    }
+
+    .bar-month {
+      font-size: 14px;
+      color: #bfe5ff;
+    }
+
+    .chart-foot {
+      padding-top: 12px;
+      text-align: right;
+      color: #b6d3ea;
+      font-size: 13px;
+    }
+
+    .bottom-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .heat-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
+    .legend {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      display: inline-block;
+    }
+
+    .heat-matrix {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+
+    .heat-table {
+      min-width: 1180px;
+      background: rgba(255,255,255,.02);
+    }
+
+    .cell-0 { background: rgba(59,184,255,.10); }
+    .cell-1 { background: rgba(0,208,132,.14); }
+    .cell-2 { background: rgba(255,200,87,.18); }
+    .cell-3 { background: rgba(255,155,47,.22); }
+    .cell-4 { background: rgba(255,95,95,.20); }
+
+    .footnote {
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 1280px) {
+      .cards-grid { grid-template-columns: repeat(3, 1fr); }
+      .top-grid, .mid-grid { grid-template-columns: 1fr; }
+      .filters { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 780px) {
+      .page { padding: 18px; }
+      .cards-grid { grid-template-columns: 1fr; }
+      .filters { grid-template-columns: 1fr; }
+      .summary-list { grid-template-columns: 1fr; }
+      .header { flex-direction: column; }
+      .method-kpi-value { font-size: 36px; }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="page">
+    <div class="header">
+      <div class="title-wrap">
+        <h1>Painel Executivo · Limpeza Escolar</h1>
+        <h2>Acompanhamento · Contrato SME · 134/2021</h2>
+        <p>Modelo executivo com leitura dinâmica por visão, filtros e comparação anual.</p>
+      </div>
+      <div class="brand">COMLURB · base inicial para evolução no VS Code online</div>
+    </div>
 
-<div class="container">
+    <section class="panel filters">
+      <div class="filter">
+        <label for="ano">Ano</label>
+        <select id="ano">
+          <option>2026</option>
+          <option>2025</option>
+          <option>2024</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label for="mes">Mês</label>
+        <select id="mes">
+          <option>Fev</option>
+          <option>Jan</option>
+          <option>Mar</option>
+          <option>Abr</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label for="unidade">CRE / Unidade</label>
+        <select id="unidade">
+          <option>Todas</option>
+          <option>CRE 1</option>
+          <option>CRE 2</option>
+          <option>CRE 3</option>
+        </select>
+      </div>
+      <div class="filter">
+        <label for="visao">Visão</label>
+        <select id="visao">
+          <option value="30d">Executivo · 30 dias</option>
+          <option value="real">Técnico · Real</option>
+        </select>
+      </div>
+      <div class="view-tag" id="viewTag">Oficial / Executivo = 30 dias</div>
+    </section>
 
-  <div class="titulo">
-    Painel Executivo · Limpeza Escolar
+    <section class="cards-grid">
+      <article class="card" style="--accent: var(--blue)">
+        <div class="card-label">Valor contratado</div>
+        <div class="card-value">R$ 12.855.228</div>
+        <div class="card-chip chip-blue">base mensal vigente</div>
+        <div class="card-note">Respeita pré e pós-reajuste conforme o valor contratado do mês.</div>
+      </article>
+
+      <article class="card" style="--accent: var(--cyan)">
+        <div class="card-label">Faturamento operacional</div>
+        <div class="card-value">R$ 11.368.395</div>
+        <div class="card-chip chip-green">bruto - retroativo</div>
+        <div class="card-note">Na visão executiva, considerar bruto menos retroativo apenas de mai/2025 até dez/2025 quando o filtro alcançar esse período.</div>
+      </article>
+
+      <article class="card" style="--accent: var(--orange)">
+        <div class="card-label">Glosa operacional</div>
+        <div class="card-value">R$ 1.486.834</div>
+        <div class="card-chip chip-orange">11,6% do contratado</div>
+        <div class="card-note">Diferença entre o contratado e o faturamento operacional do período filtrado.</div>
+      </article>
+
+      <article class="card" style="--accent: var(--green)">
+        <div class="card-label">% de execução</div>
+        <div class="card-value">88,4%</div>
+        <div class="card-chip chip-green">critério executivo</div>
+        <div class="card-note">Faturamento operacional dividido pelo valor contratado.</div>
+      </article>
+
+      <article class="card" style="--accent: var(--blue)">
+        <div class="card-label">Valor dia</div>
+        <div class="card-value" id="cardValorDia">R$ 204,39</div>
+        <div class="card-chip chip-blue" id="chipValorDia">base 30 dias</div>
+        <div class="card-note" id="notaValorDia">Faturamento operacional ÷ postos × 30.</div>
+      </article>
+
+      <article class="card" style="--accent: var(--red)">
+        <div class="card-label" id="labelImpacto">Impacto de faltas estimado</div>
+        <div class="card-value" id="valorImpacto">7.274</div>
+        <div class="card-chip chip-orange" id="chipImpacto">postos-dia</div>
+        <div class="card-note" id="notaImpacto">Estimativa derivada da glosa e do valor-dia real do período.</div>
+      </article>
+    </section>
+
+    <section class="top-grid">
+      <div class="panel">
+        <h3 class="section-title" id="resumoMetodoTitulo">Leitura principal do método selecionado</h3>
+        <div class="method-tabs">
+          <button class="tab" data-method="glosa">Glosa %</button>
+          <button class="tab active" data-method="fat">Faturamento</button>
+          <button class="tab" data-method="faltas">Faltas</button>
+          <button class="tab" data-method="media">Média / dia</button>
+        </div>
+
+        <div class="method-highlight">
+          <div class="method-kpi-title" id="methodTitle">Faturamento operacional</div>
+          <div class="method-kpi-value" id="methodValue">R$ 22.474.779</div>
+          <div class="card-chip chip-green" id="methodChip">87,4% de execução</div>
+          <div class="method-kpi-foot" id="methodFoot">Bruto menos retroativo no contexto filtrado.</div>
+          <div class="method-kpi-sub" id="methodSub">Na visão executiva, a leitura privilegia a base 30 dias. Na visão técnica, o card passa a exibir o valor real correspondente ao filtro.</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h3 class="section-title">Síntese rápida da seleção</h3>
+        <div class="summary-list">
+          <div class="mini-box">
+            <div class="k">Visão ativa</div>
+            <div class="v" id="miniVisao">Executivo · 30 dias</div>
+            <div class="s">Os rótulos e descrições mudam conforme a visão selecionada.</div>
+          </div>
+          <div class="mini-box">
+            <div class="k">Período</div>
+            <div class="v">Fev/2026</div>
+            <div class="s">Pode refletir ano cheio ou período filtrado.</div>
+          </div>
+          <div class="mini-box">
+            <div class="k">Glosa em R$</div>
+            <div class="v">R$ 1.486.834</div>
+            <div class="s">Leitura financeira direta do impacto no faturamento.</div>
+          </div>
+          <div class="mini-box">
+            <div class="k">Média de faltas no ano</div>
+            <div class="v">6.182</div>
+            <div class="s">Incluída para deixar a seleção mais completa.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="mid-grid">
+      <div class="chart-card">
+        <h3 class="section-title" id="chartTitle">Valores mensais reais do ano</h3>
+        <div class="chart-area" id="barsArea"></div>
+        <div class="chart-foot" id="chartFoot">Ano selecionado · meses realizados · valores reais da base</div>
+      </div>
+
+      <div class="table-card">
+        <h3 class="section-title">Resumo anual</h3>
+        <table>
+          <thead>
+            <tr>
+              <th>Ano</th>
+              <th>Contratado</th>
+              <th>Fat. operacional</th>
+              <th>Glosa em R$</th>
+              <th>% Glosa</th>
+              <th>Média faltas ano</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>2024</strong></td>
+              <td>R$ 132.278.154</td>
+              <td>R$ 126.335.121</td>
+              <td>R$ 5.943.033</td>
+              <td>4,5%</td>
+              <td>3.985</td>
+            </tr>
+            <tr>
+              <td><strong>2025</strong></td>
+              <td>R$ 145.672.595</td>
+              <td>R$ 131.648.207</td>
+              <td>R$ 14.024.388</td>
+              <td>9,6%</td>
+              <td>5.412</td>
+            </tr>
+            <tr>
+              <td><strong>2026</strong></td>
+              <td>R$ 25.710.456</td>
+              <td>R$ 22.474.779</td>
+              <td>R$ 3.235.677</td>
+              <td>12,6%</td>
+              <td>6.182</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="footnote">Comparação anual considerando meses realizados, com inclusão de glosa em R$ e média de faltas no ano para ampliar a leitura executiva.</div>
+      </div>
+    </section>
+
+    <section class="bottom-grid">
+      <div class="heat-card">
+        <div class="heat-top">
+          <div>
+            <h3 class="section-title" style="margin-bottom:8px;">Mapa de calor interativo · todas as unidades</h3>
+            <div style="color: var(--muted); font-size: 13px;">Versão dinâmica com troca de métrica: faltas, média/dia, taxa e glosa em R$.</div>
+          </div>
+          <div class="metric-tabs">
+            <button class="tab active" data-heat="faltas">Faltas</button>
+            <button class="tab" data-heat="media">Média / dia</button>
+            <button class="tab" data-heat="taxa">Taxa (%)</button>
+            <button class="tab" data-heat="glosa">Glosa (R$)</button>
+          </div>
+        </div>
+
+        <div class="legend">
+          <span><i class="dot" style="background:#214e94"></i> Crítico / zero</span>
+          <span><i class="dot" style="background:#00d084"></i> Muito baixo</span>
+          <span><i class="dot" style="background:#7ad66c"></i> Baixo</span>
+          <span><i class="dot" style="background:#ffc857"></i> Moderado</span>
+          <span><i class="dot" style="background:#ff9b2f"></i> Alto</span>
+          <span><i class="dot" style="background:#ff5f5f"></i> Crítico</span>
+        </div>
+
+        <div class="heat-matrix">
+          <table class="heat-table">
+            <thead>
+              <tr>
+                <th>Unidade</th>
+                <th>Jan</th>
+                <th>Fev</th>
+                <th>Mar</th>
+                <th>Abr</th>
+                <th>Mai</th>
+                <th>Jun</th>
+                <th>Jul</th>
+                <th>Ago</th>
+                <th>Set</th>
+                <th>Out</th>
+                <th>Nov</th>
+                <th>Dez</th>
+                <th>Méd.</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody id="heatBody"></tbody>
+          </table>
+        </div>
+
+        <div class="footnote">Sugestão visual: manter esse bloco com comportamento dinâmico por botões, sem trocar o layout principal da tela.</div>
+      </div>
+    </section>
   </div>
 
-  <div class="subtitulo">
-    Acompanhamento · Contrato SME · 134/2021
-  </div>
+  <script>
+    const visaoSelect = document.getElementById('visao');
+    const viewTag = document.getElementById('viewTag');
+    const miniVisao = document.getElementById('miniVisao');
+    const labelImpacto = document.getElementById('labelImpacto');
+    const valorImpacto = document.getElementById('valorImpacto');
+    const chipImpacto = document.getElementById('chipImpacto');
+    const notaImpacto = document.getElementById('notaImpacto');
+    const cardValorDia = document.getElementById('cardValorDia');
+    const chipValorDia = document.getElementById('chipValorDia');
+    const notaValorDia = document.getElementById('notaValorDia');
+    const resumoMetodoTitulo = document.getElementById('resumoMetodoTitulo');
 
-  <div class="filtros">
-    <div class="filtro">Ano: 2026</div>
-    <div class="filtro">Mês: Fev</div>
-    <div class="filtro">Visão: Executivo 30D</div>
-  </div>
+    const methodTitle = document.getElementById('methodTitle');
+    const methodValue = document.getElementById('methodValue');
+    const methodChip = document.getElementById('methodChip');
+    const methodFoot = document.getElementById('methodFoot');
+    const methodSub = document.getElementById('methodSub');
 
-  <div class="kpis">
+    const barsArea = document.getElementById('barsArea');
+    const chartTitle = document.getElementById('chartTitle');
+    const chartFoot = document.getElementById('chartFoot');
 
-    <div class="card">
-      <h3>Contratado</h3>
-      <p>R$ 12.855.228</p>
-    </div>
+    const methodTabs = document.querySelectorAll('[data-method]');
+    const heatTabs = document.querySelectorAll('[data-heat]');
 
-    <div class="card">
-      <h3>Faturamento</h3>
-      <p>R$ 11.368.395</p>
-    </div>
+    let currentMethod = 'fat';
+    let currentHeat = 'faltas';
 
-    <div class="card">
-      <h3>Glosa</h3>
-      <p class="vermelho">R$ 1.486.834</p>
-    </div>
+    const monthlyData = {
+      faltas: [13.6, 11.6, 12.8, 10.4, 9.8, 8.7, 7.9, 8.1, 8.9, 9.5, 10.1, 11.2],
+      media: [228, 204, 212, 198, 187, 176, 170, 171, 180, 188, 194, 201],
+      taxa: [11.4, 10.7, 11.0, 9.8, 9.4, 8.9, 8.2, 8.5, 8.8, 9.2, 9.6, 10.1],
+      glosa: [1.82, 1.49, 1.56, 1.38, 1.21, 1.09, 0.98, 1.02, 1.11, 1.26, 1.34, 1.41]
+    };
 
-    <div class="card">
-      <h3>% Execução</h3>
-      <p class="vermelho">88,4%</p>
-    </div>
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 
-    <div class="card">
-      <h3>Valor Dia</h3>
-      <p>R$ 204,39</p>
-    </div>
+    const heatData = {
+      faltas: [
+        ['1ª CRE',3,4,3,2,2,1,1,2,2,3,3,4,2.5,74],
+        ['2ª CRE',2,3,2,2,1,1,1,1,2,2,2,3,1.8,55],
+        ['3ª CRE',4,4,3,3,2,2,2,2,3,3,4,4,3.0,92],
+        ['4ª CRE',1,2,2,1,1,1,0,1,1,2,2,2,1.3,39],
+        ['5ª CRE',3,3,4,3,3,2,2,2,3,4,4,4,3.1,96]
+      ],
+      media: [
+        ['1ª CRE',4,4,3,3,2,2,2,2,2,3,3,4,213,2554],
+        ['2ª CRE',3,3,2,2,2,1,1,1,2,2,2,3,184,2208],
+        ['3ª CRE',4,4,4,3,3,2,2,2,3,3,4,4,236,2832],
+        ['4ª CRE',2,2,2,1,1,1,0,1,1,2,2,2,145,1740],
+        ['5ª CRE',4,4,4,3,3,2,2,2,3,4,4,4,241,2892]
+      ],
+      taxa: [
+        ['1ª CRE',3,4,3,2,2,1,1,2,2,3,3,4,10.2,122.4],
+        ['2ª CRE',2,3,2,2,1,1,1,1,2,2,2,3,8.6,103.2],
+        ['3ª CRE',4,4,3,3,2,2,2,2,3,3,4,4,11.4,136.8],
+        ['4ª CRE',1,2,2,1,1,1,0,1,1,2,2,2,6.7,80.4],
+        ['5ª CRE',3,3,4,3,3,2,2,2,3,4,4,4,11.6,139.2]
+      ],
+      glosa: [
+        ['1ª CRE',4,4,3,3,2,2,2,2,2,3,3,4,'R$ 1,12 mi','R$ 13,4 mi'],
+        ['2ª CRE',3,3,2,2,2,1,1,1,2,2,2,3,'R$ 0,88 mi','R$ 10,6 mi'],
+        ['3ª CRE',4,4,4,3,3,2,2,2,3,3,4,4,'R$ 1,39 mi','R$ 16,7 mi'],
+        ['4ª CRE',2,2,2,1,1,1,0,1,1,2,2,2,'R$ 0,61 mi','R$ 7,3 mi'],
+        ['5ª CRE',4,4,4,3,3,2,2,2,3,4,4,4,'R$ 1,44 mi','R$ 17,3 mi']
+      ]
+    };
 
-    <div class="card">
-      <h3>Faltas (média/dia)</h3>
-      <p>41</p>
-    </div>
+    function updateView() {
+      const is30d = visaoSelect.value === '30d';
 
-  </div>
+      viewTag.textContent = is30d ? 'Oficial / Executivo = 30 dias' : 'Oficial / Técnico = valor real';
+      miniVisao.textContent = is30d ? 'Executivo · 30 dias' : 'Técnico · Real';
+      resumoMetodoTitulo.textContent = is30d ? 'Leitura principal do método selecionado' : 'Leitura técnica do método selecionado';
 
-  <div class="bloco">
-    <h3>Regiões com Mais Descontos</h3>
+      cardValorDia.textContent = is30d ? 'R$ 204,39' : 'R$ 187,62';
+      chipValorDia.textContent = is30d ? 'base 30 dias' : 'valor real';
+      notaValorDia.textContent = is30d
+        ? 'Faturamento operacional ÷ postos × 30.'
+        : 'Faturamento operacional ÷ postos-dia reais do período.';
 
-    <table>
-      <thead>
-        <tr>
-          <th>Região</th>
-          <th>Glosa (R$)</th>
-          <th>Média Faltas/Dia</th>
-        </tr>
-      </thead>
+      labelImpacto.textContent = is30d ? 'Impacto de faltas estimado' : 'Faltas reais';
+      valorImpacto.textContent = is30d ? '7.274' : '6.918';
+      chipImpacto.textContent = is30d ? 'postos-dia' : 'média / dia: 231';
+      notaImpacto.textContent = is30d
+        ? 'Estimativa derivada da glosa e do valor-dia real do período.'
+        : 'Leitura técnica com base na apuração real do período filtrado.';
 
-      <tbody>
-        <tr>
-          <td>Zona Norte</td>
-          <td>R$ 120.000</td>
-          <td>48</td>
-        </tr>
+      renderMethod();
+    }
 
-        <tr>
-          <td>Zona Oeste</td>
-          <td>R$ 98.000</td>
-          <td>39</td>
-        </tr>
+    function renderMethod() {
+      const is30d = visaoSelect.value === '30d';
 
-        <tr>
-          <td>Centro</td>
-          <td>R$ 75.000</td>
-          <td>31</td>
-        </tr>
-      </tbody>
+      const content = {
+        glosa: {
+          title: is30d ? '% glosa operacional' : '% glosa real',
+          value: is30d ? '12,6%' : '11,8%',
+          chip: is30d ? 'comparação com contratado' : 'apuração técnica',
+          foot: is30d ? 'Leitura percentual do desconto no contexto filtrado.' : 'Valor percentual considerando a base real do período.',
+          sub: is30d ? 'Bom para leitura executiva rápida.' : 'Mais aderente à análise detalhada.'
+        },
+        fat: {
+          title: 'Faturamento operacional',
+          value: 'R$ 22.474.779',
+          chip: is30d ? '87,4% de execução' : 'valor realizado',
+          foot: is30d ? 'Bruto menos retroativo no contexto filtrado.' : 'Valor real realizado no contexto filtrado.',
+          sub: 'Em mai/2025 a dez/2025, o bruto menos retroativo deve respeitar essa janela quando o filtro alcançar esse intervalo.'
+        },
+        faltas: {
+          title: is30d ? 'Impacto de faltas estimado' : 'Faltas reais',
+          value: is30d ? '7.274' : '6.918',
+          chip: is30d ? 'postos-dia' : 'média / dia: 231',
+          foot: is30d ? 'Estimativa derivada da glosa e do valor-dia.' : 'Quantidade real apurada no período filtrado.',
+          sub: is30d ? 'Na visão executiva, usa lógica estimada.' : 'Na visão técnica, o nome e a descrição mudam para refletir o real.'
+        },
+        media: {
+          title: 'Média / dia',
+          value: is30d ? '242' : '231',
+          chip: is30d ? 'base executiva' : 'base real',
+          foot: is30d ? 'Média estimada por dia útil no período.' : 'Média real diária do período filtrado.',
+          sub: 'Incluída no bloco porque ajuda a leitura da seleção e foi pedida para ficar visível.'
+        }
+      };
 
-    </table>
-  </div>
+      const data = content[currentMethod];
+      methodTitle.textContent = data.title;
+      methodValue.textContent = data.value;
+      methodChip.textContent = data.chip;
+      methodFoot.textContent = data.foot;
+      methodSub.textContent = data.sub;
+    }
 
-</div>
+    function renderBars() {
+      barsArea.innerHTML = '';
+      const dataset = monthlyData[currentHeat];
+      const max = Math.max(...dataset);
 
+      const titles = {
+        faltas: 'Valores mensais reais do ano · faltas',
+        media: 'Valores mensais reais do ano · média / dia',
+        taxa: 'Valores mensais reais do ano · taxa %',
+        glosa: 'Valores mensais reais do ano · glosa em R$ mi'
+      };
+
+      const foots = {
+        faltas: 'Ano selecionado · meses realizados · valores reais da base',
+        media: 'Ano selecionado · leitura real de média diária',
+        taxa: 'Ano selecionado · percentual real do período',
+        glosa: 'Ano selecionado · glosa financeira efetiva por mês'
+      };
+
+      chartTitle.textContent = titles[currentHeat];
+      chartFoot.textContent = foots[currentHeat];
+
+      dataset.forEach((v, i) => {
+        const col = document.createElement('div');
+        col.className = 'bar-col';
+
+        const top = document.createElement('div');
+        top.className = 'bar-label-top';
+        top.textContent =
+          currentHeat === 'glosa'
+            ? `R$ ${v.toFixed(2)} mi`
+            : currentHeat === 'media'
+              ? v
+              : `${v.toFixed(1).replace('.', ',')}${currentHeat === 'taxa' || currentHeat === 'faltas' ? '%' : ''}`;
+
+        const bar = document.createElement('div');
+        bar.className = 'bar';
+        bar.style.height = `${(v / max) * 150 + 20}px`;
+
+        const month = document.createElement('div');
+        month.className = 'bar-month';
+        month.textContent = months[i];
+
+        col.appendChild(top);
+        col.appendChild(bar);
+        col.appendChild(month);
+        barsArea.appendChild(col);
+      });
+    }
+
+    function renderHeat() {
+      const tbody = document.getElementById('heatBody');
+      tbody.innerHTML = '';
+
+      heatData[currentHeat].forEach(row => {
+        const tr = document.createElement('tr');
+
+        row.forEach((cell, index) => {
+          const td = document.createElement('td');
+          if (index > 0 && index < 13 && typeof cell === 'number') td.className = `cell-${cell}`;
+          td.textContent = cell;
+          tr.appendChild(td);
+        });
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    methodTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        methodTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentMethod = tab.dataset.method;
+        renderMethod();
+      });
+    });
+
+    heatTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        heatTabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentHeat = tab.dataset.heat;
+        renderBars();
+        renderHeat();
+      });
+    });
+
+    visaoSelect.addEventListener('change', updateView);
+
+    updateView();
+    renderBars();
+    renderHeat();
+  </script>
 </body>
 </html>
