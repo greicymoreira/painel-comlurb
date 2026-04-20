@@ -44,11 +44,12 @@
     }
 
     .topbar{
-      display:flex;
-      align-items:flex-start;
-      gap:18px;
-      margin-bottom:20px;
-      flex-wrap:wrap;
+  display:flex;
+  align-items:flex-start;
+  justify-content:flex-start;
+  gap:18px;
+  margin-bottom:20px;
+  flex-wrap:wrap;
     }
 
     .brand{
@@ -60,24 +61,27 @@
       order:-1;
     }
 
-    .brand img{
-      max-height:58px;
-      width:auto;
-      display:block;
-      object-fit:contain;
-      filter:drop-shadow(0 4px 12px rgba(0,0,0,.20));
-    }
+.brand{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  gap:14px;
+  min-width:auto;
+  margin-right:8px;
+}
 
-    .brand-text{
-      text-align:left;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.4;
-    }
+.brand-text{
+  text-align:left;
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.4;
+}
 
     .title-wrap{
-      flex:1;
-      min-width:280px;
+.title-wrap{
+  flex:1;
+  min-width:280px;
+}
     }
 
     .title-wrap h1{
