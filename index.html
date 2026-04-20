@@ -3,938 +3,1463 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Painel Executivo · Limpeza Escolar</title>
+  <title>Painel Executivo · COMLURB · Contrato SME</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
   <style>
-    :root {
-      --bg: #061a2d;
-      --bg-2: #082544;
-      --bg-3: #0b3158;
-      --card: rgba(8, 33, 58, 0.92);
-      --line: rgba(79, 195, 247, 0.18);
-      --text: #f4f8fc;
-      --muted: #9fb5c9;
-      --blue: #3bb8ff;
-      --cyan: #4de0ff;
-      --green: #00d084;
-      --orange: #ff9b2f;
-      --red: #ff5f5f;
-      --yellow: #ffc857;
-      --shadow: 0 10px 30px rgba(0,0,0,.30);
-      --radius: 20px;
+    :root{
+      --bg:#03111f;
+      --bg2:#071c31;
+      --bg3:#0b2a48;
+      --card:#0b2139ee;
+      --line:rgba(99, 179, 237, .18);
+      --text:#f3f8fd;
+      --muted:#9db2c6;
+      --blue:#3bb8ff;
+      --cyan:#55e6ff;
+      --green:#00d084;
+      --orange:#ff9b2f;
+      --yellow:#ffc857;
+      --red:#ff5f5f;
+      --shadow:0 18px 45px rgba(0,0,0,.28);
+      --radius:20px;
     }
 
-    * { box-sizing: border-box; }
-
-    body {
-      margin: 0;
+    *{box-sizing:border-box}
+    html,body{margin:0;padding:0}
+    body{
       font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(circle at top right, rgba(59,184,255,.10), transparent 25%),
-        linear-gradient(180deg, #041221 0%, #061a2d 40%, #04111d 100%);
-      color: var(--text);
+        radial-gradient(circle at top right, rgba(59,184,255,.10), transparent 24%),
+        linear-gradient(180deg,#04101b 0%, #061a2d 35%, #04111d 100%);
     }
 
-    .page {
-      max-width: 1540px;
-      margin: 0 auto;
-      padding: 28px 28px 40px;
+    .page{
+      max-width:1560px;
+      margin:0 auto;
+      padding:28px 28px 40px;
     }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 24px;
-      margin-bottom: 22px;
+    .topbar{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:24px;
+      margin-bottom:20px;
     }
 
-    .title-wrap h1 {
-      margin: 0;
-      font-size: 30px;
-      line-height: 1.15;
-      font-weight: 800;
-      letter-spacing: .2px;
+    .title-wrap h1{
+      margin:0;
+      font-size:30px;
+      line-height:1.1;
+      font-weight:900;
+      letter-spacing:.2px;
     }
 
-    .title-wrap h2 {
-      margin: 8px 0 0;
-      font-size: 18px;
-      color: #dce8f4;
-      font-weight: 600;
+    .title-wrap h2{
+      margin:8px 0 0;
+      font-size:17px;
+      font-weight:700;
+      color:#dce9f6;
     }
 
-    .title-wrap p {
-      margin: 10px 0 0;
-      color: var(--muted);
-      font-size: 13px;
+    .title-wrap p{
+      margin:10px 0 0;
+      color:var(--muted);
+      font-size:13px;
     }
 
-    .brand {
-      min-width: 220px;
-      display: flex;
-      justify-content: flex-end;
-      align-items: center;
-      color: var(--muted);
-      font-size: 12px;
-      text-align: right;
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap:14px;
+      min-width:220px;
     }
 
-    .panel, .card, .table-card, .chart-card, .heat-card {
-      background: linear-gradient(180deg, rgba(6,29,52,.96), rgba(4,22,39,.96));
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+    .brand img{
+      max-height:58px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+      filter:drop-shadow(0 4px 12px rgba(0,0,0,.20));
     }
 
-    .filters {
-      display: grid;
-      grid-template-columns: 150px 150px 180px 210px 1fr;
-      gap: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
+    .brand-text{
+      text-align:right;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
     }
 
-    .filter {
-      background: rgba(8, 35, 60, .95);
-      border: 1px solid rgba(59,184,255,.22);
-      border-radius: 14px;
-      padding: 10px 14px;
-      min-height: 62px;
+    .panel, .card, .box{
+      background:linear-gradient(180deg, rgba(7,28,49,.96), rgba(4,19,33,.96));
+      border:1px solid var(--line);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
     }
 
-    .filter label {
-      display: block;
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1.6px;
-      color: #8db0c8;
-      margin-bottom: 6px;
-      font-weight: 700;
+    .filters{
+      display:grid;
+      grid-template-columns: 150px 170px 240px 220px 1fr auto;
+      gap:12px;
+      padding:14px;
+      margin-bottom:14px;
     }
 
-    .filter select {
-      width: 100%;
-      background: transparent;
-      color: var(--text);
-      border: none;
-      outline: none;
-      font-size: 15px;
-      font-weight: 700;
-      cursor: pointer;
+    .filter{
+      background:rgba(8,34,58,.95);
+      border:1px solid rgba(59,184,255,.18);
+      border-radius:14px;
+      padding:10px 14px;
+      min-height:66px;
     }
 
-    .filter select option {
-      color: #111;
+    .filter label{
+      display:block;
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:1.7px;
+      font-weight:800;
+      color:#8fb0c6;
+      margin-bottom:6px;
     }
 
-    .view-tag {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 10px 16px;
-      font-weight: 800;
-      font-size: 16px;
-      color: #ffe9d2;
-      background: linear-gradient(180deg, rgba(255,155,47,.20), rgba(255,155,47,.08));
-      border: 1px solid rgba(255,155,47,.45);
-      border-radius: 14px;
+    .filter select{
+      width:100%;
+      border:none;
+      outline:none;
+      background:transparent;
+      color:var(--text);
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
     }
 
-    .cards-grid {
-      display: grid;
+    .filter select option{
+      color:#111;
+    }
+
+    .view-tag{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:14px;
+      padding:10px 16px;
+      font-weight:900;
+      font-size:15px;
+      text-align:center;
+      color:#ffe7cf;
+      border:1px solid rgba(255,155,47,.40);
+      background:linear-gradient(180deg, rgba(255,155,47,.18), rgba(255,155,47,.06));
+      min-height:66px;
+    }
+
+    .btn-clear{
+      min-height:66px;
+      padding:0 18px;
+      border:none;
+      border-radius:14px;
+      cursor:pointer;
+      font-weight:900;
+      color:#dff4ff;
+      background:linear-gradient(180deg, rgba(59,184,255,.22), rgba(59,184,255,.10));
+      border:1px solid rgba(59,184,255,.25);
+    }
+
+    .cards{
+      display:grid;
       grid-template-columns: repeat(6, 1fr);
-      gap: 12px;
-      margin-bottom: 14px;
+      gap:12px;
+      margin-bottom:14px;
     }
 
-    .card {
-      padding: 16px 16px 14px;
-      min-height: 132px;
-      position: relative;
-      overflow: hidden;
+    .card{
+      padding:16px;
+      min-height:136px;
+      position:relative;
+      overflow:hidden;
     }
 
-    .card::before {
-      content: "";
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 3px;
-      background: linear-gradient(90deg, rgba(255,255,255,0), var(--accent, var(--blue)), rgba(255,255,255,0));
+    .card::before{
+      content:"";
+      position:absolute;
+      left:0; right:0; top:0;
+      height:3px;
+      background:linear-gradient(90deg, transparent, var(--accent, var(--blue)), transparent);
     }
 
-    .card-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1.8px;
-      color: #91adc3;
-      font-weight: 800;
-      margin-bottom: 8px;
+    .card-label{
+      font-size:10px;
+      text-transform:uppercase;
+      letter-spacing:1.8px;
+      color:#90adc2;
+      font-weight:900;
+      margin-bottom:8px;
     }
 
-    .card-value {
-      font-size: 19px;
-      font-weight: 900;
-      margin-bottom: 8px;
-      line-height: 1.1;
+    .card-value{
+      font-size:24px;
+      font-weight:900;
+      line-height:1.08;
+      margin-bottom:8px;
     }
 
-    .card-chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 5px 10px;
-      border-radius: 999px;
-      font-size: 11px;
-      font-weight: 800;
-      margin-bottom: 10px;
-      background: rgba(255,255,255,.07);
-      color: white;
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:5px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+      margin-bottom:10px;
+      background:rgba(255,255,255,.08);
     }
 
-    .chip-green { background: rgba(0,208,132,.18); color: #8dffc9; }
-    .chip-orange { background: rgba(255,155,47,.18); color: #ffd4a6; }
-    .chip-red { background: rgba(255,95,95,.18); color: #ffc0c0; }
-    .chip-blue { background: rgba(59,184,255,.18); color: #b8ebff; }
+    .chip.blue{background:rgba(59,184,255,.18); color:#bcecff}
+    .chip.green{background:rgba(0,208,132,.18); color:#99ffce}
+    .chip.orange{background:rgba(255,155,47,.18); color:#ffd6af}
+    .chip.red{background:rgba(255,95,95,.18); color:#ffc2c2}
 
-    .card-note {
-      font-size: 12px;
-      color: var(--muted);
-      line-height: 1.35;
+    .card-note{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.35;
     }
 
-    .top-grid {
-      display: grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 14px;
-      margin-bottom: 14px;
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1.18fr .82fr;
+      gap:14px;
+      margin-bottom:14px;
     }
 
-    .panel {
-      padding: 18px;
-    }
-
-    .section-title {
-      margin: 0 0 14px;
-      font-size: 15px;
-      letter-spacing: 1.8px;
-      text-transform: uppercase;
-      font-weight: 900;
-    }
-
-    .method-tabs, .metric-tabs {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-
-    .tab {
-      border: 1px solid rgba(59,184,255,.22);
-      background: rgba(11,39,67,.9);
-      color: #d9e8f7;
-      border-radius: 999px;
-      padding: 10px 14px;
-      font-weight: 800;
-      font-size: 13px;
-      cursor: pointer;
-    }
-
-    .tab.active {
-      border-color: rgba(255,155,47,.55);
-      color: #ffd6ab;
-      box-shadow: inset 0 0 0 1px rgba(255,155,47,.15);
-    }
-
-    .method-highlight {
-      border-top: 3px solid var(--cyan);
-      padding-top: 16px;
-      min-height: 190px;
-    }
-
-    .method-kpi-title {
-      color: #8fc0dd;
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      margin-bottom: 12px;
-    }
-
-    .method-kpi-value {
-      font-size: 50px;
-      font-weight: 900;
-      line-height: 1;
-      margin-bottom: 12px;
-    }
-
-    .method-kpi-foot {
-      margin-top: 10px;
-      color: #d3e4f3;
-      font-size: 15px;
-    }
-
-    .method-kpi-sub {
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 10px;
-      line-height: 1.4;
-    }
-
-    .summary-list {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-      margin-top: 16px;
-    }
-
-    .mini-box {
-      padding: 14px;
-      border-radius: 14px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.07);
-    }
-
-    .mini-box .k {
-      color: #87a5bc;
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
-      margin-bottom: 6px;
-    }
-
-    .mini-box .v {
-      font-size: 23px;
-      font-weight: 900;
-      margin-bottom: 4px;
-    }
-
-    .mini-box .s {
-      color: var(--muted);
-      font-size: 12px;
-    }
-
-    .mid-grid {
-      display: grid;
+    .grid-2b{
+      display:grid;
       grid-template-columns: .95fr 1.05fr;
-      gap: 14px;
-      margin-bottom: 14px;
+      gap:14px;
+      margin-bottom:14px;
     }
 
-    .table-card, .chart-card, .heat-card {
-      padding: 18px;
+    .box{
+      padding:18px;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 14px;
+    .section-title{
+      margin:0 0 14px;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:1.8px;
+      font-weight:900;
     }
 
-    th, td {
-      padding: 12px 8px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      text-align: left;
+    .tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:14px;
     }
 
-    th {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1.7px;
-      color: #95afc3;
+    .tab{
+      border:1px solid rgba(59,184,255,.18);
+      background:rgba(11,39,67,.90);
+      color:#dceaf7;
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:900;
+      font-size:13px;
+      cursor:pointer;
     }
 
-    td strong { font-weight: 900; }
-
-    .chart-area {
-      display: flex;
-      align-items: end;
-      justify-content: space-between;
-      gap: 18px;
-      height: 260px;
-      padding: 28px 8px 14px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
+    .tab.active{
+      border-color:rgba(255,155,47,.55);
+      color:#ffd6ab;
+      box-shadow:inset 0 0 0 1px rgba(255,155,47,.12);
     }
 
-    .bar-col {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: end;
-      gap: 10px;
+    .hero{
+      border-top:3px solid var(--cyan);
+      padding-top:16px;
+      min-height:210px;
     }
 
-    .bar-label-top {
-      font-size: 13px;
-      color: #ebf5ff;
-      font-weight: 700;
+    .hero-k{
+      color:#8ec2de;
+      font-size:12px;
+      text-transform:uppercase;
+      letter-spacing:2.6px;
+      margin-bottom:10px;
     }
 
-    .bar {
-      width: 40px;
-      border-radius: 14px 14px 0 0;
-      background: linear-gradient(180deg, #ff9b2f, #bf6500);
-      border: 1px solid rgba(255,200,140,.35);
-      box-shadow: 0 8px 20px rgba(255,155,47,.18);
+    .hero-v{
+      font-size:50px;
+      font-weight:900;
+      line-height:1;
+      margin-bottom:12px;
     }
 
-    .bar-month {
-      font-size: 14px;
-      color: #bfe5ff;
+    .hero-foot{
+      font-size:15px;
+      color:#d5e5f4;
+      margin-top:10px;
     }
 
-    .chart-foot {
-      padding-top: 12px;
-      text-align: right;
-      color: #b6d3ea;
-      font-size: 13px;
+    .hero-sub{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--muted);
+      line-height:1.45;
     }
 
-    .bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr;
-      gap: 14px;
+    .mini-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:12px;
     }
 
-    .heat-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 16px;
-      flex-wrap: wrap;
+    .mini{
+      padding:14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.03);
+      border:1px solid rgba(255,255,255,.06);
     }
 
-    .legend {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 12px;
+    .mini .k{
+      color:#89a7be;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:1.5px;
+      margin-bottom:6px;
     }
 
-    .legend span {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
+    .mini .v{
+      font-size:24px;
+      font-weight:900;
+      margin-bottom:4px;
     }
 
-    .dot {
-      width: 12px;
-      height: 12px;
-      border-radius: 999px;
-      display: inline-block;
+    .mini .s{
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.35;
     }
 
-    .heat-matrix {
-      overflow-x: auto;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.06);
+    table{
+      width:100%;
+      border-collapse:collapse;
     }
 
-    .heat-table {
-      min-width: 1180px;
-      background: rgba(255,255,255,.02);
+    th, td{
+      padding:12px 8px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+      font-size:14px;
     }
 
-    .cell-0 { background: rgba(59,184,255,.10); }
-    .cell-1 { background: rgba(0,208,132,.14); }
-    .cell-2 { background: rgba(255,200,87,.18); }
-    .cell-3 { background: rgba(255,155,47,.22); }
-    .cell-4 { background: rgba(255,95,95,.20); }
-
-    .footnote {
-      margin-top: 14px;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
+    th{
+      color:#94aec4;
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:1.6px;
     }
 
-    @media (max-width: 1280px) {
-      .cards-grid { grid-template-columns: repeat(3, 1fr); }
-      .top-grid, .mid-grid { grid-template-columns: 1fr; }
-      .filters { grid-template-columns: repeat(2, 1fr); }
+    .table-wrap{
+      overflow:auto;
     }
 
-    @media (max-width: 780px) {
-      .page { padding: 18px; }
-      .cards-grid { grid-template-columns: 1fr; }
-      .filters { grid-template-columns: 1fr; }
-      .summary-list { grid-template-columns: 1fr; }
-      .header { flex-direction: column; }
-      .method-kpi-value { font-size: 36px; }
+    .bar-chart{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      height:290px;
+      padding:24px 8px 14px;
+      border-bottom:1px solid rgba(255,255,255,.06);
+    }
+
+    .bar-col{
+      width:100%;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-end;
+      gap:10px;
+    }
+
+    .bar-top{
+      font-size:12px;
+      color:#eaf5ff;
+      font-weight:800;
+      text-align:center;
+      min-height:32px;
+    }
+
+    .bar{
+      width:40px;
+      border-radius:14px 14px 0 0;
+      background:linear-gradient(180deg, #47ccff, #1368a8);
+      border:1px solid rgba(170,225,255,.24);
+      box-shadow:0 10px 24px rgba(59,184,255,.14);
+      transition:.2s ease;
+    }
+
+    .bar:hover{
+      filter:brightness(1.1);
+      transform:translateY(-2px);
+    }
+
+    .bar-month{
+      font-size:13px;
+      color:#badcf2;
+      font-weight:700;
+    }
+
+    .chart-foot{
+      padding-top:12px;
+      text-align:right;
+      color:#b6d3ea;
+      font-size:13px;
+    }
+
+    .legend{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:12px;
+      margin-bottom:12px;
+    }
+
+    .legend span{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+    }
+
+    .dot{
+      width:12px;
+      height:12px;
+      border-radius:999px;
+      display:inline-block;
+    }
+
+    .heat-wrap{
+      overflow:auto;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.06);
+    }
+
+    .heat-table{
+      min-width:1180px;
+      background:rgba(255,255,255,.02);
+    }
+
+    .c0{ background:rgba(59,184,255,.10); }
+    .c1{ background:rgba(0,208,132,.14); }
+    .c2{ background:rgba(255,200,87,.18); }
+    .c3{ background:rgba(255,155,47,.22); }
+    .c4{ background:rgba(255,95,95,.20); }
+
+    .footnote{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.5;
+    }
+
+    .status{
+      margin-top:10px;
+      color:#9fd0ea;
+      font-size:13px;
+    }
+
+    .error{
+      color:#ffc6c6;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    @media (max-width:1320px){
+      .cards{grid-template-columns:repeat(3,1fr)}
+      .grid-2,.grid-2b{grid-template-columns:1fr}
+      .filters{grid-template-columns:repeat(2,1fr)}
+    }
+
+    @media (max-width:780px){
+      .page{padding:18px}
+      .topbar{flex-direction:column}
+      .cards{grid-template-columns:1fr}
+      .filters{grid-template-columns:1fr}
+      .mini-grid{grid-template-columns:1fr}
+      .hero-v{font-size:36px}
+      .brand{justify-content:flex-start}
     }
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="header">
+    <header class="topbar">
       <div class="title-wrap">
-        <h1>Painel Executivo · Limpeza Escolar</h1>
-        <h2>Acompanhamento · Contrato SME · 134/2021</h2>
-        <p>Modelo executivo com leitura dinâmica por visão, filtros e comparação anual.</p>
+        <h1>Painel Executivo · Contrato SME</h1>
+        <h2>COMLURB · Limpeza Escolar</h2>
+        <p>Leitura executiva com atualização automática a partir do Google Sheets publicado em CSV.</p>
+        <div id="statusMsg" class="status">Carregando base...</div>
       </div>
-      <div class="brand">COMLURB · base inicial para evolução no VS Code online</div>
-    </div>
+
+      <div class="brand">
+        <img id="brandLogo" alt="Logo" />
+        <div class="brand-text">
+          <div><strong>COMLURB</strong></div>
+          <div>Modelo HTML + GitHub Pages</div>
+        </div>
+      </div>
+    </header>
 
     <section class="panel filters">
       <div class="filter">
-        <label for="ano">Ano</label>
-        <select id="ano">
-          <option>2026</option>
-          <option>2025</option>
-          <option>2024</option>
-        </select>
+        <label for="fAno">Ano</label>
+        <select id="fAno"></select>
       </div>
+
       <div class="filter">
-        <label for="mes">Mês</label>
-        <select id="mes">
-          <option>Fev</option>
-          <option>Jan</option>
-          <option>Mar</option>
-          <option>Abr</option>
-        </select>
+        <label for="fMes">Mês</label>
+        <select id="fMes"></select>
       </div>
+
       <div class="filter">
-        <label for="unidade">CRE / Unidade</label>
-        <select id="unidade">
-          <option>Todas</option>
-          <option>CRE 1</option>
-          <option>CRE 2</option>
-          <option>CRE 3</option>
-        </select>
+        <label for="fUnidade">Unidade / CRE</label>
+        <select id="fUnidade"></select>
       </div>
+
       <div class="filter">
-        <label for="visao">Visão</label>
-        <select id="visao">
+        <label for="fVisao">Visão</label>
+        <select id="fVisao">
           <option value="30d">Executivo · 30 dias</option>
           <option value="real">Técnico · Real</option>
         </select>
       </div>
+
       <div class="view-tag" id="viewTag">Oficial / Executivo = 30 dias</div>
+      <button class="btn-clear" id="btnLimpar">Limpar filtros</button>
     </section>
 
-    <section class="cards-grid">
-      <article class="card" style="--accent: var(--blue)">
+    <section class="cards">
+      <article class="card" style="--accent:var(--blue)">
         <div class="card-label">Valor contratado</div>
-        <div class="card-value">R$ 12.855.228</div>
-        <div class="card-chip chip-blue">base mensal vigente</div>
-        <div class="card-note">Respeita pré e pós-reajuste conforme o valor contratado do mês.</div>
+        <div class="card-value" id="kpiContratado">R$ 0</div>
+        <div class="chip blue" id="kpiContratadoChip">base filtrada</div>
+        <div class="card-note">Soma do valor contratado dentro do filtro aplicado.</div>
       </article>
 
-      <article class="card" style="--accent: var(--cyan)">
+      <article class="card" style="--accent:var(--cyan)">
         <div class="card-label">Faturamento operacional</div>
-        <div class="card-value">R$ 11.368.395</div>
-        <div class="card-chip chip-green">bruto - retroativo</div>
-        <div class="card-note">Na visão executiva, considerar bruto menos retroativo apenas de mai/2025 até dez/2025 quando o filtro alcançar esse período.</div>
+        <div class="card-value" id="kpiFatOp">R$ 0</div>
+        <div class="chip green" id="kpiFatOpChip">valor realizado</div>
+        <div class="card-note">Usa a coluna de faturamento operacional da base. Se não existir, calcula bruto menos retroativo.</div>
       </article>
 
-      <article class="card" style="--accent: var(--orange)">
+      <article class="card" style="--accent:var(--orange)">
         <div class="card-label">Glosa operacional</div>
-        <div class="card-value">R$ 1.486.834</div>
-        <div class="card-chip chip-orange">11,6% do contratado</div>
-        <div class="card-note">Diferença entre o contratado e o faturamento operacional do período filtrado.</div>
+        <div class="card-value" id="kpiGlosa">R$ 0</div>
+        <div class="chip orange" id="kpiGlosaChip">0,0%</div>
+        <div class="card-note">Diferença entre contratado e faturamento operacional ou coluna de glosa da base.</div>
       </article>
 
-      <article class="card" style="--accent: var(--green)">
+      <article class="card" style="--accent:var(--green)">
         <div class="card-label">% de execução</div>
-        <div class="card-value">88,4%</div>
-        <div class="card-chip chip-green">critério executivo</div>
-        <div class="card-note">Faturamento operacional dividido pelo valor contratado.</div>
+        <div class="card-value" id="kpiExecucao">0,0%</div>
+        <div class="chip green" id="kpiExecucaoChip">contratado x realizado</div>
+        <div class="card-note">Percentual de execução financeira no filtro atual.</div>
       </article>
 
-      <article class="card" style="--accent: var(--blue)">
-        <div class="card-label">Valor dia</div>
-        <div class="card-value" id="cardValorDia">R$ 204,39</div>
-        <div class="card-chip chip-blue" id="chipValorDia">base 30 dias</div>
-        <div class="card-note" id="notaValorDia">Faturamento operacional ÷ postos × 30.</div>
+      <article class="card" style="--accent:var(--blue)">
+        <div class="card-label" id="kpiDiaLabel">Valor dia</div>
+        <div class="card-value" id="kpiDia">R$ 0</div>
+        <div class="chip blue" id="kpiDiaChip">base 30 dias</div>
+        <div class="card-note" id="kpiDiaNote">Na visão executiva, usa referência 30 dias.</div>
       </article>
 
-      <article class="card" style="--accent: var(--red)">
-        <div class="card-label" id="labelImpacto">Impacto de faltas estimado</div>
-        <div class="card-value" id="valorImpacto">7.274</div>
-        <div class="card-chip chip-orange" id="chipImpacto">postos-dia</div>
-        <div class="card-note" id="notaImpacto">Estimativa derivada da glosa e do valor-dia real do período.</div>
+      <article class="card" style="--accent:var(--red)">
+        <div class="card-label" id="kpiFaltaLabel">Impacto de faltas estimado</div>
+        <div class="card-value" id="kpiFaltas">0</div>
+        <div class="chip red" id="kpiFaltasChip">postos-dia</div>
+        <div class="card-note" id="kpiFaltasNote">Na visão técnica, este card muda para Faltas Reais e Média/dia.</div>
       </article>
     </section>
 
-    <section class="top-grid">
-      <div class="panel">
-        <h3 class="section-title" id="resumoMetodoTitulo">Leitura principal do método selecionado</h3>
-        <div class="method-tabs">
-          <button class="tab" data-method="glosa">Glosa %</button>
-          <button class="tab active" data-method="fat">Faturamento</button>
-          <button class="tab" data-method="faltas">Faltas</button>
-          <button class="tab" data-method="media">Média / dia</button>
+    <section class="grid-2">
+      <div class="box">
+        <h3 class="section-title" id="heroTitleTop">Leitura principal do método selecionado</h3>
+        <div class="tabs" id="heroTabs">
+          <button class="tab active" data-hero="fat">Faturamento</button>
+          <button class="tab" data-hero="glosa">% Glosa</button>
+          <button class="tab" data-hero="faltas">Faltas</button>
+          <button class="tab" data-hero="media">Média / dia</button>
         </div>
 
-        <div class="method-highlight">
-          <div class="method-kpi-title" id="methodTitle">Faturamento operacional</div>
-          <div class="method-kpi-value" id="methodValue">R$ 22.474.779</div>
-          <div class="card-chip chip-green" id="methodChip">87,4% de execução</div>
-          <div class="method-kpi-foot" id="methodFoot">Bruto menos retroativo no contexto filtrado.</div>
-          <div class="method-kpi-sub" id="methodSub">Na visão executiva, a leitura privilegia a base 30 dias. Na visão técnica, o card passa a exibir o valor real correspondente ao filtro.</div>
+        <div class="hero">
+          <div class="hero-k" id="heroK">Faturamento operacional</div>
+          <div class="hero-v" id="heroV">R$ 0</div>
+          <div class="chip green" id="heroChip">base do período</div>
+          <div class="hero-foot" id="heroFoot">Leitura consolidada com base no filtro atual.</div>
+          <div class="hero-sub" id="heroSub">Na visão executiva, o painel prioriza leitura mais simples. Na técnica, os rótulos passam a refletir o valor real.</div>
         </div>
       </div>
 
-      <div class="panel">
+      <div class="box">
         <h3 class="section-title">Síntese rápida da seleção</h3>
-        <div class="summary-list">
-          <div class="mini-box">
+        <div class="mini-grid">
+          <div class="mini">
             <div class="k">Visão ativa</div>
             <div class="v" id="miniVisao">Executivo · 30 dias</div>
-            <div class="s">Os rótulos e descrições mudam conforme a visão selecionada.</div>
+            <div class="s">Os rótulos mudam conforme a visão selecionada.</div>
           </div>
-          <div class="mini-box">
+
+          <div class="mini">
             <div class="k">Período</div>
-            <div class="v">Fev/2026</div>
-            <div class="s">Pode refletir ano cheio ou período filtrado.</div>
+            <div class="v" id="miniPeriodo">Todos</div>
+            <div class="s">Ano, mês e unidade escolhidos nos filtros.</div>
           </div>
-          <div class="mini-box">
+
+          <div class="mini">
             <div class="k">Glosa em R$</div>
-            <div class="v">R$ 1.486.834</div>
+            <div class="v" id="miniGlosa">R$ 0</div>
             <div class="s">Leitura financeira direta do impacto no faturamento.</div>
           </div>
-          <div class="mini-box">
-            <div class="k">Média de faltas no ano</div>
-            <div class="v">6.182</div>
-            <div class="s">Incluída para deixar a seleção mais completa.</div>
+
+          <div class="mini">
+            <div class="k">Média de faltas / dia</div>
+            <div class="v" id="miniMediaFaltas">0</div>
+            <div class="s">Incluída para deixar a leitura mais completa.</div>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="mid-grid">
-      <div class="chart-card">
-        <h3 class="section-title" id="chartTitle">Valores mensais reais do ano</h3>
-        <div class="chart-area" id="barsArea"></div>
-        <div class="chart-foot" id="chartFoot">Ano selecionado · meses realizados · valores reais da base</div>
+    <section class="grid-2b">
+      <div class="box">
+        <h3 class="section-title" id="chartTitle">Evolução mensal</h3>
+        <div class="tabs" id="chartTabs">
+          <button class="tab active" data-chart="fat">Faturamento</button>
+          <button class="tab" data-chart="glosa">Glosa</button>
+          <button class="tab" data-chart="faltas">Faltas</button>
+          <button class="tab" data-chart="media">Média / dia</button>
+        </div>
+        <div class="bar-chart" id="barChart"></div>
+        <div class="chart-foot" id="chartFoot">Ano selecionado · leitura mensal</div>
       </div>
 
-      <div class="table-card">
-        <h3 class="section-title">Resumo anual</h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Ano</th>
-              <th>Contratado</th>
-              <th>Fat. operacional</th>
-              <th>Glosa em R$</th>
-              <th>% Glosa</th>
-              <th>Média faltas ano</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td><strong>2024</strong></td>
-              <td>R$ 132.278.154</td>
-              <td>R$ 126.335.121</td>
-              <td>R$ 5.943.033</td>
-              <td>4,5%</td>
-              <td>3.985</td>
-            </tr>
-            <tr>
-              <td><strong>2025</strong></td>
-              <td>R$ 145.672.595</td>
-              <td>R$ 131.648.207</td>
-              <td>R$ 14.024.388</td>
-              <td>9,6%</td>
-              <td>5.412</td>
-            </tr>
-            <tr>
-              <td><strong>2026</strong></td>
-              <td>R$ 25.710.456</td>
-              <td>R$ 22.474.779</td>
-              <td>R$ 3.235.677</td>
-              <td>12,6%</td>
-              <td>6.182</td>
-            </tr>
-          </tbody>
-        </table>
-        <div class="footnote">Comparação anual considerando meses realizados, com inclusão de glosa em R$ e média de faltas no ano para ampliar a leitura executiva.</div>
-      </div>
-    </section>
-
-    <section class="bottom-grid">
-      <div class="heat-card">
-        <div class="heat-top">
-          <div>
-            <h3 class="section-title" style="margin-bottom:8px;">Mapa de calor interativo · todas as unidades</h3>
-            <div style="color: var(--muted); font-size: 13px;">Versão dinâmica com troca de métrica: faltas, média/dia, taxa e glosa em R$.</div>
-          </div>
-          <div class="metric-tabs">
-            <button class="tab active" data-heat="faltas">Faltas</button>
-            <button class="tab" data-heat="media">Média / dia</button>
-            <button class="tab" data-heat="taxa">Taxa (%)</button>
-            <button class="tab" data-heat="glosa">Glosa (R$)</button>
-          </div>
-        </div>
-
-        <div class="legend">
-          <span><i class="dot" style="background:#214e94"></i> Crítico / zero</span>
-          <span><i class="dot" style="background:#00d084"></i> Muito baixo</span>
-          <span><i class="dot" style="background:#7ad66c"></i> Baixo</span>
-          <span><i class="dot" style="background:#ffc857"></i> Moderado</span>
-          <span><i class="dot" style="background:#ff9b2f"></i> Alto</span>
-          <span><i class="dot" style="background:#ff5f5f"></i> Crítico</span>
-        </div>
-
-        <div class="heat-matrix">
-          <table class="heat-table">
+      <div class="box">
+        <h3 class="section-title">Regiões com mais descontos</h3>
+        <div class="table-wrap">
+          <table>
             <thead>
               <tr>
                 <th>Unidade</th>
-                <th>Jan</th>
-                <th>Fev</th>
-                <th>Mar</th>
-                <th>Abr</th>
-                <th>Mai</th>
-                <th>Jun</th>
-                <th>Jul</th>
-                <th>Ago</th>
-                <th>Set</th>
-                <th>Out</th>
-                <th>Nov</th>
-                <th>Dez</th>
-                <th>Méd.</th>
-                <th>Total</th>
+                <th>Contratado</th>
+                <th>Fat. operacional</th>
+                <th>Glosa</th>
+                <th>% Glosa</th>
+                <th>Média faltas/dia</th>
               </tr>
             </thead>
-            <tbody id="heatBody"></tbody>
+            <tbody id="rankingBody"></tbody>
           </table>
         </div>
-
-        <div class="footnote">Sugestão visual: manter esse bloco com comportamento dinâmico por botões, sem trocar o layout principal da tela.</div>
+        <div class="footnote">Ordenado do pior para o melhor, conforme glosa percentual dentro da seleção atual.</div>
       </div>
+    </section>
+
+    <section class="box">
+      <h3 class="section-title">Mapa de calor · todas as unidades</h3>
+
+      <div class="tabs" id="heatTabs">
+        <button class="tab active" data-heat="faltas">Faltas</button>
+        <button class="tab" data-heat="media">Média / dia</button>
+        <button class="tab" data-heat="taxa">Taxa (%)</button>
+        <button class="tab" data-heat="glosa">Glosa (R$)</button>
+      </div>
+
+      <div class="legend">
+        <span><i class="dot" style="background:#2a64b8"></i>Muito baixo</span>
+        <span><i class="dot" style="background:#00d084"></i>Baixo</span>
+        <span><i class="dot" style="background:#ffc857"></i>Moderado</span>
+        <span><i class="dot" style="background:#ff9b2f"></i>Alto</span>
+        <span><i class="dot" style="background:#ff5f5f"></i>Crítico</span>
+      </div>
+
+      <div class="heat-wrap">
+        <table class="heat-table">
+          <thead>
+            <tr id="heatHeadRow"></tr>
+          </thead>
+          <tbody id="heatBody"></tbody>
+        </table>
+      </div>
+
+      <div class="footnote">Esse bloco lê a base mensal por unidade e monta uma visão comparativa do ano selecionado.</div>
     </section>
   </div>
 
   <script>
-    const visaoSelect = document.getElementById('visao');
-    const viewTag = document.getElementById('viewTag');
-    const miniVisao = document.getElementById('miniVisao');
-    const labelImpacto = document.getElementById('labelImpacto');
-    const valorImpacto = document.getElementById('valorImpacto');
-    const chipImpacto = document.getElementById('chipImpacto');
-    const notaImpacto = document.getElementById('notaImpacto');
-    const cardValorDia = document.getElementById('cardValorDia');
-    const chipValorDia = document.getElementById('chipValorDia');
-    const notaValorDia = document.getElementById('notaValorDia');
-    const resumoMetodoTitulo = document.getElementById('resumoMetodoTitulo');
+    /******************************************************************
+     * 1) CONFIGURAÇÃO
+     ******************************************************************/
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_pOHwnQ8u94Wd56llh_YaJko5gT2fM8A9YeMvd3XyRfgFec9Yjhe7jI-wVskFg2nC3RFVHyvWRJCa/pub?gid=1856807338&single=true&output=csv";
+    const LOGO_URL = "./RIOPREFEITURA Comlurb horizontal monocromatica branca.png";"
 
-    const methodTitle = document.getElementById('methodTitle');
-    const methodValue = document.getElementById('methodValue');
-    const methodChip = document.getElementById('methodChip');
-    const methodFoot = document.getElementById('methodFoot');
-    const methodSub = document.getElementById('methodSub');
+    /******************************************************************
+     * 2) ESTADO GLOBAL
+     ******************************************************************/
+    const MESES = [
+      { num: 1, nome: "Jan" },
+      { num: 2, nome: "Fev" },
+      { num: 3, nome: "Mar" },
+      { num: 4, nome: "Abr" },
+      { num: 5, nome: "Mai" },
+      { num: 6, nome: "Jun" },
+      { num: 7, nome: "Jul" },
+      { num: 8, nome: "Ago" },
+      { num: 9, nome: "Set" },
+      { num: 10, nome: "Out" },
+      { num: 11, nome: "Nov" },
+      { num: 12, nome: "Dez" }
+    ];
 
-    const barsArea = document.getElementById('barsArea');
-    const chartTitle = document.getElementById('chartTitle');
-    const chartFoot = document.getElementById('chartFoot');
-
-    const methodTabs = document.querySelectorAll('[data-method]');
-    const heatTabs = document.querySelectorAll('[data-heat]');
-
-    let currentMethod = 'fat';
-    let currentHeat = 'faltas';
-
-    const monthlyData = {
-      faltas: [13.6, 11.6, 12.8, 10.4, 9.8, 8.7, 7.9, 8.1, 8.9, 9.5, 10.1, 11.2],
-      media: [228, 204, 212, 198, 187, 176, 170, 171, 180, 188, 194, 201],
-      taxa: [11.4, 10.7, 11.0, 9.8, 9.4, 8.9, 8.2, 8.5, 8.8, 9.2, 9.6, 10.1],
-      glosa: [1.82, 1.49, 1.56, 1.38, 1.21, 1.09, 0.98, 1.02, 1.11, 1.26, 1.34, 1.41]
+    const state = {
+      raw: [],
+      filtered: [],
+      heroMetric: "fat",
+      chartMetric: "fat",
+      heatMetric: "faltas"
     };
 
-    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    /******************************************************************
+     * 3) ELEMENTOS
+     ******************************************************************/
+    const statusMsg = document.getElementById("statusMsg");
+    const brandLogo = document.getElementById("brandLogo");
 
-    const heatData = {
-      faltas: [
-        ['1ª CRE',3,4,3,2,2,1,1,2,2,3,3,4,2.5,74],
-        ['2ª CRE',2,3,2,2,1,1,1,1,2,2,2,3,1.8,55],
-        ['3ª CRE',4,4,3,3,2,2,2,2,3,3,4,4,3.0,92],
-        ['4ª CRE',1,2,2,1,1,1,0,1,1,2,2,2,1.3,39],
-        ['5ª CRE',3,3,4,3,3,2,2,2,3,4,4,4,3.1,96]
-      ],
-      media: [
-        ['1ª CRE',4,4,3,3,2,2,2,2,2,3,3,4,213,2554],
-        ['2ª CRE',3,3,2,2,2,1,1,1,2,2,2,3,184,2208],
-        ['3ª CRE',4,4,4,3,3,2,2,2,3,3,4,4,236,2832],
-        ['4ª CRE',2,2,2,1,1,1,0,1,1,2,2,2,145,1740],
-        ['5ª CRE',4,4,4,3,3,2,2,2,3,4,4,4,241,2892]
-      ],
-      taxa: [
-        ['1ª CRE',3,4,3,2,2,1,1,2,2,3,3,4,10.2,122.4],
-        ['2ª CRE',2,3,2,2,1,1,1,1,2,2,2,3,8.6,103.2],
-        ['3ª CRE',4,4,3,3,2,2,2,2,3,3,4,4,11.4,136.8],
-        ['4ª CRE',1,2,2,1,1,1,0,1,1,2,2,2,6.7,80.4],
-        ['5ª CRE',3,3,4,3,3,2,2,2,3,4,4,4,11.6,139.2]
-      ],
-      glosa: [
-        ['1ª CRE',4,4,3,3,2,2,2,2,2,3,3,4,'R$ 1,12 mi','R$ 13,4 mi'],
-        ['2ª CRE',3,3,2,2,2,1,1,1,2,2,2,3,'R$ 0,88 mi','R$ 10,6 mi'],
-        ['3ª CRE',4,4,4,3,3,2,2,2,3,3,4,4,'R$ 1,39 mi','R$ 16,7 mi'],
-        ['4ª CRE',2,2,2,1,1,1,0,1,1,2,2,2,'R$ 0,61 mi','R$ 7,3 mi'],
-        ['5ª CRE',4,4,4,3,3,2,2,2,3,4,4,4,'R$ 1,44 mi','R$ 17,3 mi']
-      ]
-    };
+    const fAno = document.getElementById("fAno");
+    const fMes = document.getElementById("fMes");
+    const fUnidade = document.getElementById("fUnidade");
+    const fVisao = document.getElementById("fVisao");
+    const btnLimpar = document.getElementById("btnLimpar");
 
-    function updateView() {
-      const is30d = visaoSelect.value === '30d';
+    const viewTag = document.getElementById("viewTag");
+    const miniVisao = document.getElementById("miniVisao");
+    const miniPeriodo = document.getElementById("miniPeriodo");
+    const miniGlosa = document.getElementById("miniGlosa");
+    const miniMediaFaltas = document.getElementById("miniMediaFaltas");
 
-      viewTag.textContent = is30d ? 'Oficial / Executivo = 30 dias' : 'Oficial / Técnico = valor real';
-      miniVisao.textContent = is30d ? 'Executivo · 30 dias' : 'Técnico · Real';
-      resumoMetodoTitulo.textContent = is30d ? 'Leitura principal do método selecionado' : 'Leitura técnica do método selecionado';
+    const kpiContratado = document.getElementById("kpiContratado");
+    const kpiContratadoChip = document.getElementById("kpiContratadoChip");
+    const kpiFatOp = document.getElementById("kpiFatOp");
+    const kpiFatOpChip = document.getElementById("kpiFatOpChip");
+    const kpiGlosa = document.getElementById("kpiGlosa");
+    const kpiGlosaChip = document.getElementById("kpiGlosaChip");
+    const kpiExecucao = document.getElementById("kpiExecucao");
+    const kpiExecucaoChip = document.getElementById("kpiExecucaoChip");
+    const kpiDiaLabel = document.getElementById("kpiDiaLabel");
+    const kpiDia = document.getElementById("kpiDia");
+    const kpiDiaChip = document.getElementById("kpiDiaChip");
+    const kpiDiaNote = document.getElementById("kpiDiaNote");
+    const kpiFaltaLabel = document.getElementById("kpiFaltaLabel");
+    const kpiFaltas = document.getElementById("kpiFaltas");
+    const kpiFaltasChip = document.getElementById("kpiFaltasChip");
+    const kpiFaltasNote = document.getElementById("kpiFaltasNote");
 
-      cardValorDia.textContent = is30d ? 'R$ 204,39' : 'R$ 187,62';
-      chipValorDia.textContent = is30d ? 'base 30 dias' : 'valor real';
-      notaValorDia.textContent = is30d
-        ? 'Faturamento operacional ÷ postos × 30.'
-        : 'Faturamento operacional ÷ postos-dia reais do período.';
+    const heroTitleTop = document.getElementById("heroTitleTop");
+    const heroK = document.getElementById("heroK");
+    const heroV = document.getElementById("heroV");
+    const heroChip = document.getElementById("heroChip");
+    const heroFoot = document.getElementById("heroFoot");
+    const heroSub = document.getElementById("heroSub");
 
-      labelImpacto.textContent = is30d ? 'Impacto de faltas estimado' : 'Faltas reais';
-      valorImpacto.textContent = is30d ? '7.274' : '6.918';
-      chipImpacto.textContent = is30d ? 'postos-dia' : 'média / dia: 231';
-      notaImpacto.textContent = is30d
-        ? 'Estimativa derivada da glosa e do valor-dia real do período.'
-        : 'Leitura técnica com base na apuração real do período filtrado.';
+    const chartTitle = document.getElementById("chartTitle");
+    const chartFoot = document.getElementById("chartFoot");
+    const barChart = document.getElementById("barChart");
+    const rankingBody = document.getElementById("rankingBody");
 
-      renderMethod();
+    const heatHeadRow = document.getElementById("heatHeadRow");
+    const heatBody = document.getElementById("heatBody");
+
+    /******************************************************************
+     * 4) UTILITÁRIOS
+     ******************************************************************/
+    function norm(text) {
+      return String(text ?? "")
+        .trim()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase();
     }
 
-    function renderMethod() {
-      const is30d = visaoSelect.value === '30d';
+    function toNumber(v) {
+      if (v === null || v === undefined || v === "") return 0;
+      if (typeof v === "number") return isFinite(v) ? v : 0;
+
+      let s = String(v).trim();
+      if (!s) return 0;
+
+      s = s
+        .replace(/R\$/gi, "")
+        .replace(/\s/g, "")
+        .replace(/\./g, "")
+        .replace(/,/g, ".")
+        .replace(/%/g, "");
+
+      const n = parseFloat(s);
+      return isFinite(n) ? n : 0;
+    }
+
+    function brl(v) {
+      return new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+        maximumFractionDigits: 0
+      }).format(v || 0);
+    }
+
+    function num(v, digits = 1) {
+      return new Intl.NumberFormat("pt-BR", {
+        minimumFractionDigits: digits,
+        maximumFractionDigits: digits
+      }).format(v || 0);
+    }
+
+    function pct(v, digits = 1) {
+      return `${num(v, digits)}%`;
+    }
+
+    function unique(arr) {
+      return [...new Set(arr)];
+    }
+
+    function monthNameByNum(n) {
+      const found = MESES.find(m => m.num === Number(n));
+      return found ? found.nome : "";
+    }
+
+    function safeDivide(a, b) {
+      return b ? a / b : 0;
+    }
+
+    function getField(row, names) {
+      for (const name of names) {
+        if (row[name] !== undefined) return row[name];
+      }
+      return "";
+    }
+
+    function firstNonZero(values) {
+      for (const v of values) {
+        const n = toNumber(v);
+        if (n) return n;
+      }
+      return 0;
+    }
+
+    /******************************************************************
+     * 5) NORMALIZAÇÃO DA BASE
+     ******************************************************************/
+    function normalizeRow(row) {
+      const ano = Number(firstNonZero([
+        getField(row, ["Ano", "ANO", "ano"])
+      ]));
+
+      const mesNum = Number(firstNonZero([
+        getField(row, ["Mês_Num", "Mes_Num", "MES_NUM", "mes_num", "Mês_num"])
+      ]));
+
+      const mes = String(
+        getField(row, ["Mês", "Mes", "MES", "mes"]) || monthNameByNum(mesNum)
+      ).trim();
+
+      const unidade = String(
+        getField(row, ["Unidade", "UNIDADE", "unidade", "CRE", "Unidade/CRE"])
+      ).trim() || "Sem unidade";
+
+      const contratado = toNumber(getField(row, [
+        "Valor_Contratado", "VALOR_CONTRATADO", "Contratado", "Valor Contratado"
+      ]));
+
+      const bruto = toNumber(getField(row, [
+        "Faturamento_Bruto", "FATURAMENTO_BRUTO", "Bruto", "Faturamento Bruto"
+      ]));
+
+      const retroativo = toNumber(getField(row, [
+        "Retroativo", "RETROATIVO"
+      ]));
+
+      let fatOperacional = toNumber(getField(row, [
+        "Fat_Operacional", "FAT_OPERACIONAL", "Faturamento_Operacional", "Fat Operacional"
+      ]));
+
+      if (!fatOperacional) {
+        fatOperacional = bruto - retroativo;
+      }
+
+      let glosaOperacional = toNumber(getField(row, [
+        "Glosa_Operacional", "GLOSA_OPERACIONAL", "Glosa", "Glosa Operacional"
+      ]));
+
+      if (!glosaOperacional) {
+        glosaOperacional = Math.max(0, contratado - fatOperacional);
+      }
+
+      const postos = toNumber(getField(row, [
+        "Postos", "POSTOS"
+      ]));
+
+      const diasMes = toNumber(getField(row, [
+        "Dias_Mês", "Dias_Mes", "DIAS_MES"
+      ]));
+
+      const valorPostoDiaContratual = toNumber(getField(row, [
+        "Valor_Posto_Dia_Contratual", "VALOR_POSTO_DIA_CONTRATUAL"
+      ]));
+
+      const valorDiaReal = toNumber(getField(row, [
+        "Valor_Dia_Real", "VALOR_DIA_REAL"
+      ]));
+
+      const faltasReais = toNumber(getField(row, [
+        "Faltas_Reais", "FALTAS_REAIS", "Faltas", "Faltas Reais"
+      ]));
+
+      let glosaPct = toNumber(getField(row, [
+        "Glosa_%", "Glosa_% ", "GLOSA_%", "Glosa %", "Glosa%"
+      ]));
+
+      if (!glosaPct) {
+        glosaPct = safeDivide(glosaOperacional, contratado) * 100;
+      }
+
+      const mesRealizado = String(getField(row, [
+        "Mês_Realizado", "Mes_Realizado", "MES_REALIZADO"
+      ])).trim();
+
+      return {
+        ano,
+        mesNum,
+        mes: mes || monthNameByNum(mesNum),
+        unidade,
+        contratado,
+        bruto,
+        retroativo,
+        fatOperacional,
+        glosaOperacional,
+        postos,
+        diasMes,
+        valorPostoDiaContratual,
+        valorDiaReal,
+        faltasReais,
+        glosaPct,
+        mesRealizado,
+        _raw: row
+      };
+    }
+
+    /******************************************************************
+     * 6) CARREGAR CSV
+     ******************************************************************/
+    async function loadData() {
+      try {
+        brandLogo.src = LOGO_URL || "";
+        brandLogo.onerror = () => {
+          brandLogo.classList.add("hidden");
+        };
+
+        if (!CSV_URL || CSV_URL.includes("COLE_AQUI")) {
+          throw new Error("Você ainda não preencheu a variável CSV_URL.");
+        }
+
+        Papa.parse(CSV_URL, {
+          download: true,
+          header: true,
+          skipEmptyLines: true,
+          complete: function(results) {
+            const rows = (results.data || []).map(normalizeRow).filter(r => r.ano && r.unidade);
+            state.raw = rows;
+
+            if (!rows.length) {
+              throw new Error("A planilha foi lida, mas não retornou linhas válidas.");
+            }
+
+            buildFilters();
+            applyFilters();
+            statusMsg.textContent = `Base carregada com ${rows.length} linhas.`;
+          },
+          error: function(err) {
+            showError(`Erro ao ler CSV: ${err.message || err}`);
+          }
+        });
+      } catch (err) {
+        showError(err.message || String(err));
+      }
+    }
+
+    function showError(message) {
+      statusMsg.innerHTML = `<span class="error">Erro: ${message}</span>`;
+    }
+
+    /******************************************************************
+     * 7) FILTROS
+     ******************************************************************/
+    function buildFilters() {
+      const anos = unique(state.raw.map(r => r.ano)).sort((a,b) => b - a);
+      const unidades = unique(state.raw.map(r => r.unidade)).sort((a,b) => a.localeCompare(b, "pt-BR"));
+
+      fAno.innerHTML = `<option value="Todos">Todos</option>` + anos.map(a => `<option value="${a}">${a}</option>`).join("");
+      fMes.innerHTML = `<option value="Todos">Todos</option>` + MESES.map(m => `<option value="${m.num}">${m.nome}</option>`).join("");
+      fUnidade.innerHTML = `<option value="Todas">Todas</option>` + unidades.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join("");
+
+      if (anos.length) {
+        fAno.value = String(anos[0]);
+      }
+      fMes.value = "Todos";
+      fUnidade.value = "Todas";
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
+    function applyFilters() {
+      const ano = fAno.value;
+      const mes = fMes.value;
+      const unidade = fUnidade.value;
+
+      state.filtered = state.raw.filter(r => {
+        const okAno = ano === "Todos" || String(r.ano) === String(ano);
+        const okMes = mes === "Todos" || String(r.mesNum) === String(mes);
+        const okUnidade = unidade === "Todas" || r.unidade === unidade;
+        return okAno && okMes && okUnidade;
+      });
+
+      renderAll();
+    }
+
+    /******************************************************************
+     * 8) AGREGAÇÕES
+     ******************************************************************/
+    function summarize(rows) {
+      const contratado = rows.reduce((s, r) => s + r.contratado, 0);
+      const fatOperacional = rows.reduce((s, r) => s + r.fatOperacional, 0);
+      const glosa = rows.reduce((s, r) => s + r.glosaOperacional, 0);
+      const postos = rows.reduce((s, r) => s + r.postos, 0);
+      const dias = rows.reduce((s, r) => s + r.diasMes, 0);
+      const faltas = rows.reduce((s, r) => s + r.faltasReais, 0);
+
+      const execucaoPct = safeDivide(fatOperacional, contratado) * 100;
+      const glosaPct = safeDivide(glosa, contratado) * 100;
+
+      const valorDia30 = safeDivide(fatOperacional, postos * 30);
+      const valorDiaReal = firstNonZero([
+        safeDivide(rows.reduce((s, r) => s + (r.valorDiaReal || 0), 0), rows.filter(r => r.valorDiaReal > 0).length),
+        safeDivide(fatOperacional, postos * Math.max(dias, 1))
+      ]);
+
+      const mediaFaltasDia = safeDivide(faltas, Math.max(dias, 1));
+      const impactoEstimado = valorDiaReal ? glosa / valorDiaReal : 0;
+
+      return {
+        contratado,
+        fatOperacional,
+        glosa,
+        postos,
+        dias,
+        faltas,
+        execucaoPct,
+        glosaPct,
+        valorDia30,
+        valorDiaReal,
+        mediaFaltasDia,
+        impactoEstimado
+      };
+    }
+
+    function groupedByUnit(rows) {
+      const map = new Map();
+
+      rows.forEach(r => {
+        const key = r.unidade;
+        if (!map.has(key)) map.set(key, []);
+        map.get(key).push(r);
+      });
+
+      return [...map.entries()].map(([unidade, items]) => {
+        const s = summarize(items);
+        return {
+          unidade,
+          ...s
+        };
+      });
+    }
+
+    function groupedByMonth(rows, year, unit) {
+      return MESES.map(m => {
+        const items = rows.filter(r => r.mesNum === m.num);
+        const s = summarize(items);
+        return {
+          mesNum: m.num,
+          mes: m.nome,
+          ...s
+        };
+      });
+    }
+
+    /******************************************************************
+     * 9) RENDER GERAL
+     ******************************************************************/
+    function renderAll() {
+      updateViewLabels();
+      renderKPIs();
+      renderHero();
+      renderSummary();
+      renderRanking();
+      renderBarChart();
+      renderHeatmap();
+    }
+
+    function updateViewLabels() {
+      const is30d = fVisao.value === "30d";
+
+      viewTag.textContent = is30d ? "Oficial / Executivo = 30 dias" : "Oficial / Técnico = valor real";
+      miniVisao.textContent = is30d ? "Executivo · 30 dias" : "Técnico · Real";
+      heroTitleTop.textContent = is30d ? "Leitura principal do método selecionado" : "Leitura técnica do método selecionado";
+
+      if (is30d) {
+        kpiDiaLabel.textContent = "Valor dia";
+        kpiDiaChip.textContent = "base 30 dias";
+        kpiDiaNote.textContent = "Na visão executiva, usa a referência do valor-dia em base 30.";
+        kpiFaltaLabel.textContent = "Impacto de faltas estimado";
+        kpiFaltasChip.textContent = "postos-dia";
+        kpiFaltasNote.textContent = "Estimado pela relação entre glosa e valor-dia real.";
+      } else {
+        kpiDiaLabel.textContent = "Valor dia real";
+        kpiDiaChip.textContent = "valor real";
+        kpiDiaNote.textContent = "Na visão técnica, usa o valor-dia real do período.";
+        kpiFaltaLabel.textContent = "Faltas reais";
+        kpiFaltasChip.textContent = "média / dia";
+        kpiFaltasNote.textContent = "Na visão técnica, o card passa a mostrar o valor real.";
+      }
+    }
+
+    function renderKPIs() {
+      const s = summarize(state.filtered);
+      const is30d = fVisao.value === "30d";
+
+      kpiContratado.textContent = brl(s.contratado);
+      kpiContratadoChip.textContent = `${state.filtered.length} linha(s) da base`;
+
+      kpiFatOp.textContent = brl(s.fatOperacional);
+      kpiFatOpChip.textContent = is30d ? "operacional do período" : "valor realizado";
+
+      kpiGlosa.textContent = brl(s.glosa);
+      kpiGlosaChip.textContent = pct(s.glosaPct);
+
+      kpiExecucao.textContent = pct(s.execucaoPct);
+      kpiExecucaoChip.textContent = "contratado x realizado";
+
+      kpiDia.textContent = brl(is30d ? s.valorDia30 : s.valorDiaReal);
+      kpiFaltas.textContent = is30d ? num(s.impactoEstimado, 0) : num(s.faltas, 0);
+      kpiFaltasChip.textContent = is30d ? "postos-dia" : `média / dia: ${num(s.mediaFaltasDia, 1)}`;
+    }
+
+    function renderHero() {
+      const s = summarize(state.filtered);
+      const is30d = fVisao.value === "30d";
 
       const content = {
-        glosa: {
-          title: is30d ? '% glosa operacional' : '% glosa real',
-          value: is30d ? '12,6%' : '11,8%',
-          chip: is30d ? 'comparação com contratado' : 'apuração técnica',
-          foot: is30d ? 'Leitura percentual do desconto no contexto filtrado.' : 'Valor percentual considerando a base real do período.',
-          sub: is30d ? 'Bom para leitura executiva rápida.' : 'Mais aderente à análise detalhada.'
-        },
         fat: {
-          title: 'Faturamento operacional',
-          value: 'R$ 22.474.779',
-          chip: is30d ? '87,4% de execução' : 'valor realizado',
-          foot: is30d ? 'Bruto menos retroativo no contexto filtrado.' : 'Valor real realizado no contexto filtrado.',
-          sub: 'Em mai/2025 a dez/2025, o bruto menos retroativo deve respeitar essa janela quando o filtro alcançar esse intervalo.'
+          k: "Faturamento operacional",
+          v: brl(s.fatOperacional),
+          chip: is30d ? pct(s.execucaoPct) + " de execução" : "valor realizado",
+          foot: "Leitura financeira consolidada do período filtrado.",
+          sub: is30d
+            ? "Na visão executiva, a tela privilegia leitura mais direta."
+            : "Na visão técnica, a nomenclatura acompanha a leitura real do período."
+        },
+        glosa: {
+          k: is30d ? "% glosa operacional" : "% glosa real",
+          v: pct(s.glosaPct),
+          chip: is30d ? "comparação com contratado" : "apuração técnica",
+          foot: "Percentual de desconto dentro da seleção atual.",
+          sub: "Essa leitura ajuda a identificar rapidamente onde o contrato está mais pressionado."
         },
         faltas: {
-          title: is30d ? 'Impacto de faltas estimado' : 'Faltas reais',
-          value: is30d ? '7.274' : '6.918',
-          chip: is30d ? 'postos-dia' : 'média / dia: 231',
-          foot: is30d ? 'Estimativa derivada da glosa e do valor-dia.' : 'Quantidade real apurada no período filtrado.',
-          sub: is30d ? 'Na visão executiva, usa lógica estimada.' : 'Na visão técnica, o nome e a descrição mudam para refletir o real.'
+          k: is30d ? "Impacto de faltas estimado" : "Faltas reais",
+          v: is30d ? num(s.impactoEstimado, 0) : num(s.faltas, 0),
+          chip: is30d ? "postos-dia" : `média / dia: ${num(s.mediaFaltasDia, 1)}`,
+          foot: is30d
+            ? "Estimativa derivada da glosa e do valor-dia real."
+            : "Quantidade real apurada no período filtrado.",
+          sub: is30d
+            ? "Na visão executiva, a lógica é mais sintética."
+            : "Na visão técnica, a descrição acompanha a base real."
         },
         media: {
-          title: 'Média / dia',
-          value: is30d ? '242' : '231',
-          chip: is30d ? 'base executiva' : 'base real',
-          foot: is30d ? 'Média estimada por dia útil no período.' : 'Média real diária do período filtrado.',
-          sub: 'Incluída no bloco porque ajuda a leitura da seleção e foi pedida para ficar visível.'
+          k: "Média / dia",
+          v: num(s.mediaFaltasDia, 1),
+          chip: is30d ? "base executiva" : "base real",
+          foot: "Média de faltas por dia dentro do período filtrado.",
+          sub: "Entrou para facilitar a leitura da seleção e apoiar a análise por unidade."
         }
       };
 
-      const data = content[currentMethod];
-      methodTitle.textContent = data.title;
-      methodValue.textContent = data.value;
-      methodChip.textContent = data.chip;
-      methodFoot.textContent = data.foot;
-      methodSub.textContent = data.sub;
+      const c = content[state.heroMetric];
+      heroK.textContent = c.k;
+      heroV.textContent = c.v;
+      heroChip.textContent = c.chip;
+      heroFoot.textContent = c.foot;
+      heroSub.textContent = c.sub;
     }
 
-    function renderBars() {
-      barsArea.innerHTML = '';
-      const dataset = monthlyData[currentHeat];
-      const max = Math.max(...dataset);
+    function renderSummary() {
+      const s = summarize(state.filtered);
+      const ano = fAno.value === "Todos" ? "Todos os anos" : fAno.value;
+      const mes = fMes.value === "Todos" ? "Todos os meses" : monthNameByNum(fMes.value);
+      const unidade = fUnidade.value === "Todas" ? "Todas as unidades" : fUnidade.value;
 
-      const titles = {
-        faltas: 'Valores mensais reais do ano · faltas',
-        media: 'Valores mensais reais do ano · média / dia',
-        taxa: 'Valores mensais reais do ano · taxa %',
-        glosa: 'Valores mensais reais do ano · glosa em R$ mi'
-      };
+      miniPeriodo.textContent = `${mes} · ${ano}`;
+      miniGlosa.textContent = brl(s.glosa);
+      miniMediaFaltas.textContent = num(s.mediaFaltasDia, 1);
 
-      const foots = {
-        faltas: 'Ano selecionado · meses realizados · valores reais da base',
-        media: 'Ano selecionado · leitura real de média diária',
-        taxa: 'Ano selecionado · percentual real do período',
-        glosa: 'Ano selecionado · glosa financeira efetiva por mês'
-      };
+      if (fUnidade.value !== "Todas") {
+        miniPeriodo.textContent = `${mes} · ${ano} · ${unidade}`;
+      }
+    }
 
-      chartTitle.textContent = titles[currentHeat];
-      chartFoot.textContent = foots[currentHeat];
+    function renderRanking() {
+      const rows = groupedByUnit(state.filtered)
+        .sort((a, b) => b.glosaPct - a.glosaPct);
 
-      dataset.forEach((v, i) => {
-        const col = document.createElement('div');
-        col.className = 'bar-col';
+      rankingBody.innerHTML = "";
 
-        const top = document.createElement('div');
-        top.className = 'bar-label-top';
-        top.textContent =
-          currentHeat === 'glosa'
-            ? `R$ ${v.toFixed(2)} mi`
-            : currentHeat === 'media'
-              ? v
-              : `${v.toFixed(1).replace('.', ',')}${currentHeat === 'taxa' || currentHeat === 'faltas' ? '%' : ''}`;
+      if (!rows.length) {
+        rankingBody.innerHTML = `<tr><td colspan="6">Sem dados para a seleção atual.</td></tr>`;
+        return;
+      }
 
-        const bar = document.createElement('div');
-        bar.className = 'bar';
-        bar.style.height = `${(v / max) * 150 + 20}px`;
-
-        const month = document.createElement('div');
-        month.className = 'bar-month';
-        month.textContent = months[i];
-
-        col.appendChild(top);
-        col.appendChild(bar);
-        col.appendChild(month);
-        barsArea.appendChild(col);
+      rows.forEach(r => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td><strong>${escapeHtml(r.unidade)}</strong></td>
+          <td>${brl(r.contratado)}</td>
+          <td>${brl(r.fatOperacional)}</td>
+          <td>${brl(r.glosa)}</td>
+          <td>${pct(r.glosaPct)}</td>
+          <td>${num(r.mediaFaltasDia, 1)}</td>
+        `;
+        rankingBody.appendChild(tr);
       });
     }
 
-    function renderHeat() {
-      const tbody = document.getElementById('heatBody');
-      tbody.innerHTML = '';
+    function renderBarChart() {
+      const year = fAno.value === "Todos"
+        ? Math.max(...state.raw.map(r => r.ano))
+        : Number(fAno.value);
 
-      heatData[currentHeat].forEach(row => {
-        const tr = document.createElement('tr');
+      const unit = fUnidade.value;
+      const base = state.raw.filter(r => r.ano === year && (unit === "Todas" || r.unidade === unit));
+      const monthRows = groupedByMonth(base, year, unit);
 
-        row.forEach((cell, index) => {
-          const td = document.createElement('td');
-          if (index > 0 && index < 13 && typeof cell === 'number') td.className = `cell-${cell}`;
-          td.textContent = cell;
+      const metricMap = {
+        fat: {
+          title: "Evolução mensal · faturamento operacional",
+          foot: `Ano ${year} · leitura mensal do faturamento operacional`,
+          getter: r => r.fatOperacional,
+          formatter: v => brl(v)
+        },
+        glosa: {
+          title: "Evolução mensal · glosa operacional",
+          foot: `Ano ${year} · leitura mensal da glosa`,
+          getter: r => r.glosa,
+          formatter: v => brl(v)
+        },
+        faltas: {
+          title: "Evolução mensal · faltas reais",
+          foot: `Ano ${year} · leitura mensal de faltas`,
+          getter: r => r.faltas,
+          formatter: v => num(v, 0)
+        },
+        media: {
+          title: "Evolução mensal · média de faltas / dia",
+          foot: `Ano ${year} · média diária por mês`,
+          getter: r => r.mediaFaltasDia,
+          formatter: v => num(v, 1)
+        }
+      };
+
+      const metric = metricMap[state.chartMetric];
+      chartTitle.textContent = metric.title;
+      chartFoot.textContent = metric.foot;
+      barChart.innerHTML = "";
+
+      const values = monthRows.map(metric.getter);
+      const max = Math.max(...values, 1);
+
+      monthRows.forEach(r => {
+        const value = metric.getter(r);
+        const h = 24 + (value / max) * 165;
+
+        const col = document.createElement("div");
+        col.className = "bar-col";
+        col.innerHTML = `
+          <div class="bar-top">${metric.formatter(value)}</div>
+          <div class="bar" style="height:${h}px"></div>
+          <div class="bar-month">${r.mes}</div>
+        `;
+        barChart.appendChild(col);
+      });
+    }
+
+    function renderHeatmap() {
+      const year = fAno.value === "Todos"
+        ? Math.max(...state.raw.map(r => r.ano))
+        : Number(fAno.value);
+
+      const base = state.raw.filter(r => r.ano === year);
+      const units = unique(base.map(r => r.unidade)).sort((a,b) => a.localeCompare(b, "pt-BR"));
+
+      const monthHeaders = MESES.map(m => `<th>${m.nome}</th>`).join("");
+      heatHeadRow.innerHTML = `
+        <th>Unidade</th>
+        ${monthHeaders}
+        <th>Méd.</th>
+        <th>Total</th>
+      `;
+
+      const matrix = units.map(unidade => {
+        const rows = base.filter(r => r.unidade === unidade).sort((a,b) => a.mesNum - b.mesNum);
+
+        const monthValues = MESES.map(m => {
+          const items = rows.filter(r => r.mesNum === m.num);
+          const s = summarize(items);
+
+          switch (state.heatMetric) {
+            case "faltas": return s.faltas;
+            case "media": return s.mediaFaltasDia;
+            case "taxa": return s.glosaPct;
+            case "glosa": return s.glosa;
+            default: return 0;
+          }
+        });
+
+        const total = monthValues.reduce((a,b)=>a+b,0);
+        const media = monthValues.length ? total / monthValues.length : 0;
+
+        return { unidade, monthValues, media, total };
+      });
+
+      const allValues = matrix.flatMap(r => r.monthValues).filter(v => v > 0);
+      const min = Math.min(...allValues, 0);
+      const max = Math.max(...allValues, 1);
+
+      heatBody.innerHTML = "";
+
+      matrix.forEach(row => {
+        const tr = document.createElement("tr");
+
+        const tdName = document.createElement("td");
+        tdName.innerHTML = `<strong>${escapeHtml(row.unidade)}</strong>`;
+        tr.appendChild(tdName);
+
+        row.monthValues.forEach(v => {
+          const td = document.createElement("td");
+          td.className = colorClass(v, min, max);
+          td.textContent = formatHeatValue(v, state.heatMetric);
           tr.appendChild(td);
         });
 
-        tbody.appendChild(tr);
+        const tdMedia = document.createElement("td");
+        tdMedia.textContent = formatHeatValue(row.media, state.heatMetric);
+
+        const tdTotal = document.createElement("td");
+        tdTotal.textContent = formatHeatValue(row.total, state.heatMetric);
+
+        tr.appendChild(tdMedia);
+        tr.appendChild(tdTotal);
+        heatBody.appendChild(tr);
       });
     }
 
-    methodTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        methodTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentMethod = tab.dataset.method;
-        renderMethod();
+    function colorClass(value, min, max) {
+      if (!value) return "c0";
+      const ratio = (value - min) / (max - min || 1);
+      if (ratio <= 0.20) return "c1";
+      if (ratio <= 0.45) return "c2";
+      if (ratio <= 0.70) return "c3";
+      return "c4";
+    }
+
+    function formatHeatValue(v, metric) {
+      switch (metric) {
+        case "faltas": return num(v, 0);
+        case "media": return num(v, 1);
+        case "taxa": return pct(v, 1);
+        case "glosa": return brl(v);
+        default: return v;
+      }
+    }
+
+    /******************************************************************
+     * 10) EVENTOS
+     ******************************************************************/
+    [fAno, fMes, fUnidade, fVisao].forEach(el => {
+      el.addEventListener("change", applyFilters);
+    });
+
+    btnLimpar.addEventListener("click", () => {
+      fAno.value = "Todos";
+      fMes.value = "Todos";
+      fUnidade.value = "Todas";
+      fVisao.value = "30d";
+      applyFilters();
+    });
+
+    document.querySelectorAll("[data-hero]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-hero]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.heroMetric = btn.dataset.hero;
+        renderHero();
       });
     });
 
-    heatTabs.forEach(tab => {
-      tab.addEventListener('click', () => {
-        heatTabs.forEach(t => t.classList.remove('active'));
-        tab.classList.add('active');
-        currentHeat = tab.dataset.heat;
-        renderBars();
-        renderHeat();
+    document.querySelectorAll("[data-chart]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-chart]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.chartMetric = btn.dataset.chart;
+        renderBarChart();
       });
     });
 
-    visaoSelect.addEventListener('change', updateView);
+    document.querySelectorAll("[data-heat]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll("[data-heat]").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        state.heatMetric = btn.dataset.heat;
+        renderHeatmap();
+      });
+    });
 
-    updateView();
-    renderBars();
-    renderHeat();
+    /******************************************************************
+     * 11) INICIAR
+     ******************************************************************/
+    loadData();
   </script>
 </body>
 </html>
