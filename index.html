@@ -28,6 +28,7 @@
 
     *{box-sizing:border-box}
     html,body{margin:0;padding:0}
+
     body{
       font-family: Inter, "Segoe UI", Arial, sans-serif;
       color:var(--text);
@@ -44,10 +45,39 @@
 
     .topbar{
       display:flex;
-      justify-content:space-between;
       align-items:flex-start;
-      gap:24px;
+      gap:18px;
       margin-bottom:20px;
+      flex-wrap:wrap;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      justify-content:flex-start;
+      gap:14px;
+      min-width:auto;
+      order:-1;
+    }
+
+    .brand img{
+      max-height:58px;
+      width:auto;
+      display:block;
+      object-fit:contain;
+      filter:drop-shadow(0 4px 12px rgba(0,0,0,.20));
+    }
+
+    .brand-text{
+      text-align:left;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+    }
+
+    .title-wrap{
+      flex:1;
+      min-width:280px;
     }
 
     .title-wrap h1{
@@ -69,29 +99,6 @@
       margin:10px 0 0;
       color:var(--muted);
       font-size:13px;
-    }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      justify-content:flex-end;
-      gap:14px;
-      min-width:220px;
-    }
-
-    .brand img{
-      max-height:58px;
-      width:auto;
-      display:block;
-      object-fit:contain;
-      filter:drop-shadow(0 4px 12px rgba(0,0,0,.20));
-    }
-
-    .brand-text{
-      text-align:right;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.4;
     }
 
     .panel, .card, .box{
@@ -497,26 +504,25 @@
       .filters{grid-template-columns:1fr}
       .mini-grid{grid-template-columns:1fr}
       .hero-v{font-size:36px}
-      .brand{justify-content:flex-start}
     }
   </style>
 </head>
 <body>
   <div class="page">
     <header class="topbar">
-      <div class="title-wrap">
-        <h1>Painel Executivo · Contrato SME</h1>
-        <h2>COMLURB · Limpeza Escolar</h2>
-        <p>Leitura executiva com atualização automática a partir do Google Sheets publicado em CSV.</p>
-        <div id="statusMsg" class="status">Carregando base...</div>
-      </div>
-
       <div class="brand">
         <img id="brandLogo" alt="Logo" />
         <div class="brand-text">
           <div><strong>COMLURB</strong></div>
           <div>Modelo HTML + GitHub Pages</div>
         </div>
+      </div>
+
+      <div class="title-wrap">
+        <h1>Painel Executivo · Contrato SME</h1>
+        <h2>COMLURB · Limpeza Escolar</h2>
+        <p>Leitura executiva com atualização automática a partir do Google Sheets publicado em CSV.</p>
+        <div id="statusMsg" class="status">Carregando base...</div>
       </div>
     </header>
 
@@ -711,7 +717,7 @@
      * 1) CONFIGURAÇÃO
      ******************************************************************/
     const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_pOHwnQ8u94Wd56llh_YaJko5gT2fM8A9YeMvd3XyRfgFec9Yjhe7jI-wVskFg2nC3RFVHyvWRJCa/pub?gid=1856807338&single=true&output=csv";
-    const LOGO_URL = "./RIOPREFEITURA Comlurb horizontal monocromatica branca.png";"
+    const LOGO_URL = "./RIOPREFEITURA Comlurb horizontal monocromatica branca.png";
 
     /******************************************************************
      * 2) ESTADO GLOBAL
@@ -792,14 +798,6 @@
     /******************************************************************
      * 4) UTILITÁRIOS
      ******************************************************************/
-    function norm(text) {
-      return String(text ?? "")
-        .trim()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
-    }
-
     function toNumber(v) {
       if (v === null || v === undefined || v === "") return 0;
       if (typeof v === "number") return isFinite(v) ? v : 0;
@@ -850,10 +848,25 @@
       return b ? a / b : 0;
     }
 
+    function escapeHtml(text) {
+      return String(text)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;");
+    }
+
     function getField(row, names) {
+      const normalizedEntries = Object.entries(row).map(([k, v]) => [
+        String(k).replace(/^\uFEFF/, "").trim(),
+        v
+      ]);
+
       for (const name of names) {
-        if (row[name] !== undefined) return row[name];
+        const found = normalizedEntries.find(([k]) => k === name);
+        if (found) return found[1];
       }
+
       return "";
     }
 
@@ -883,7 +896,7 @@
 
       const unidade = String(
         getField(row, ["Unidade", "UNIDADE", "unidade", "CRE", "Unidade/CRE"])
-      ).trim() || "Sem unidade";
+      ).replace(/^\uFEFF/, "").trim() || "Sem unidade";
 
       const contratado = toNumber(getField(row, [
         "Valor_Contratado", "VALOR_CONTRATADO", "Contratado", "Valor Contratado"
@@ -934,7 +947,7 @@
       ]));
 
       let glosaPct = toNumber(getField(row, [
-        "Glosa_%", "Glosa_% ", "GLOSA_%", "Glosa %", "Glosa%"
+        "Glosa_%", "Glosa %", "Glosa%", "GLOSA_%"
       ]));
 
       if (!glosaPct) {
@@ -976,16 +989,24 @@
           brandLogo.classList.add("hidden");
         };
 
-        if (!CSV_URL || CSV_URL.includes("COLE_AQUI")) {
-          throw new Error("Você ainda não preencheu a variável CSV_URL.");
-        }
-
         Papa.parse(CSV_URL, {
           download: true,
           header: true,
           skipEmptyLines: true,
+          transformHeader: function(header) {
+            return String(header)
+              .replace(/^\uFEFF/, "")
+              .trim();
+          },
           complete: function(results) {
-            const rows = (results.data || []).map(normalizeRow).filter(r => r.ano && r.unidade);
+            console.log("CSV bruto:", results.data);
+
+            const rows = (results.data || [])
+              .map(normalizeRow)
+              .filter(r => r.ano && r.unidade);
+
+            console.log("Linhas normalizadas:", rows);
+
             state.raw = rows;
 
             if (!rows.length) {
@@ -1025,14 +1046,6 @@
       }
       fMes.value = "Todos";
       fUnidade.value = "Todas";
-    }
-
-    function escapeHtml(text) {
-      return String(text)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;");
     }
 
     function applyFilters() {
@@ -1107,7 +1120,7 @@
       });
     }
 
-    function groupedByMonth(rows, year, unit) {
+    function groupedByMonth(rows) {
       return MESES.map(m => {
         const items = rows.filter(r => r.mesNum === m.num);
         const s = summarize(items);
@@ -1273,7 +1286,7 @@
 
       const unit = fUnidade.value;
       const base = state.raw.filter(r => r.ano === year && (unit === "Todas" || r.unidade === unit));
-      const monthRows = groupedByMonth(base, year, unit);
+      const monthRows = groupedByMonth(base);
 
       const metricMap = {
         fat: {
