@@ -6,6 +6,7 @@
   <title>Painel Executivo · COMLURB · Contrato SME</title>
 
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <style>
     :root{
@@ -19,7 +20,7 @@
       --blue:#3bb8ff;
       --cyan:#55e6ff;
       --green:#00d084;
-      --orange:#ff9b2f;
+      --orange:#F97316;
       --yellow:#ffc857;
       --red:#ff5f5f;
       --shadow:0 18px 45px rgba(0,0,0,.28);
@@ -58,7 +59,6 @@
       justify-content:flex-start;
       gap:14px;
       min-width:auto;
-      order:-1;
       margin-right:8px;
     }
 
@@ -112,7 +112,7 @@
 
     .filters{
       display:grid;
-      grid-template-columns: 150px 170px 240px 220px 1fr auto;
+      grid-template-columns: 150px 170px 180px 240px 220px 1fr auto;
       gap:12px;
       padding:14px;
       margin-bottom:14px;
@@ -147,9 +147,7 @@
       cursor:pointer;
     }
 
-    .filter select option{
-      color:#111;
-    }
+    .filter select option{ color:#111; }
 
     .view-tag{
       display:flex;
@@ -161,8 +159,8 @@
       font-size:15px;
       text-align:center;
       color:#ffe7cf;
-      border:1px solid rgba(255,155,47,.40);
-      background:linear-gradient(180deg, rgba(255,155,47,.18), rgba(255,155,47,.06));
+      border:1px solid rgba(249,115,22,.40);
+      background:linear-gradient(180deg, rgba(249,115,22,.18), rgba(249,115,22,.06));
       min-height:66px;
     }
 
@@ -230,7 +228,7 @@
 
     .chip.blue{background:rgba(59,184,255,.18); color:#bcecff}
     .chip.green{background:rgba(0,208,132,.18); color:#99ffce}
-    .chip.orange{background:rgba(255,155,47,.18); color:#ffd6af}
+    .chip.orange{background:rgba(249,115,22,.18); color:#ffd6af}
     .chip.red{background:rgba(255,95,95,.18); color:#ffc2c2}
 
     .card-note{
@@ -239,23 +237,7 @@
       line-height:1.35;
     }
 
-    .grid-2{
-      display:grid;
-      grid-template-columns: 1.18fr .82fr;
-      gap:14px;
-      margin-bottom:14px;
-    }
-
-    .grid-2b{
-      display:grid;
-      grid-template-columns: .95fr 1.05fr;
-      gap:14px;
-      margin-bottom:14px;
-    }
-
-    .box{
-      padding:18px;
-    }
+    .box{ padding:18px; margin-bottom:14px; }
 
     .section-title{
       margin:0 0 14px;
@@ -265,61 +247,55 @@
       font-weight:900;
     }
 
-    .tabs{
-      display:flex;
-      flex-wrap:wrap;
-      gap:10px;
+    .narrative-grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:14px;
       margin-bottom:14px;
     }
 
-    .tab{
-      border:1px solid rgba(59,184,255,.18);
-      background:rgba(11,39,67,.90);
-      color:#dceaf7;
-      border-radius:999px;
-      padding:10px 14px;
-      font-weight:900;
-      font-size:13px;
-      cursor:pointer;
+    .narrative-card{
+      padding:18px;
+      border-radius:18px;
+      background:linear-gradient(180deg, rgba(249,115,22,.12), rgba(249,115,22,.04));
+      border:1px solid rgba(249,115,22,.25);
     }
 
-    .tab.active{
-      border-color:rgba(255,155,47,.55);
-      color:#ffd6ab;
-      box-shadow:inset 0 0 0 1px rgba(255,155,47,.12);
-    }
-
-    .hero{
-      border-top:3px solid var(--cyan);
-      padding-top:16px;
-      min-height:210px;
-    }
-
-    .hero-k{
-      color:#8ec2de;
-      font-size:12px;
-      text-transform:uppercase;
-      letter-spacing:2.6px;
-      margin-bottom:10px;
-    }
-
-    .hero-v{
-      font-size:50px;
-      font-weight:900;
-      line-height:1;
+    .narrative-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
       margin-bottom:12px;
+      flex-wrap:wrap;
     }
 
-    .hero-foot{
-      font-size:15px;
-      color:#d5e5f4;
-      margin-top:10px;
+    .narrative-status{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:7px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:900;
     }
 
-    .hero-sub{
-      margin-top:10px;
-      font-size:13px;
-      color:var(--muted);
+    .status-ok{ background:rgba(0,208,132,.16); color:#99ffce; border:1px solid rgba(0,208,132,.25); }
+    .status-att{ background:rgba(255,200,87,.16); color:#ffe39b; border:1px solid rgba(255,200,87,.25); }
+    .status-crit{ background:rgba(255,95,95,.16); color:#ffc2c2; border:1px solid rgba(255,95,95,.25); }
+
+    .bullets{
+      display:grid;
+      gap:10px;
+    }
+
+    .bullet{
+      padding:12px 14px;
+      border-radius:14px;
+      background:rgba(255,255,255,.04);
+      border:1px solid rgba(255,255,255,.06);
+      color:#e7f2fc;
+      font-size:14px;
       line-height:1.45;
     }
 
@@ -356,6 +332,87 @@
       line-height:1.35;
     }
 
+    .combo-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:12px;
+      flex-wrap:wrap;
+    }
+
+    .combo-sub{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:6px;
+    }
+
+    .combo-badges{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+    }
+
+    .combo-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      padding:8px 12px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:800;
+      color:#ffd8b0;
+      background:rgba(249,115,22,.16);
+      border:1px solid rgba(249,115,22,.35);
+    }
+
+    .combo-chart-wrap{
+      position:relative;
+      min-height:360px;
+      background:rgba(255,255,255,.02);
+      border:1px solid rgba(255,255,255,.05);
+      border-radius:16px;
+      padding:14px;
+    }
+
+    .combo-foot{
+      margin-top:10px;
+      color:var(--muted);
+      font-size:12px;
+      text-align:right;
+    }
+
+    .grid-2b{
+      display:grid;
+      grid-template-columns: .95fr 1.05fr;
+      gap:14px;
+      margin-bottom:14px;
+    }
+
+    .tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .tab{
+      border:1px solid rgba(59,184,255,.18);
+      background:rgba(11,39,67,.90);
+      color:#dceaf7;
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:900;
+      font-size:13px;
+      cursor:pointer;
+    }
+
+    .tab.active{
+      border-color:rgba(249,115,22,.55);
+      color:#ffd6ab;
+      box-shadow:inset 0 0 0 1px rgba(249,115,22,.12);
+    }
+
     table{
       width:100%;
       border-collapse:collapse;
@@ -375,9 +432,7 @@
       letter-spacing:1.6px;
     }
 
-    .table-wrap{
-      overflow:auto;
-    }
+    .table-wrap{ overflow:auto; }
 
     .bar-chart{
       display:flex;
@@ -433,28 +488,6 @@
       font-size:13px;
     }
 
-    .legend{
-      display:flex;
-      gap:12px;
-      flex-wrap:wrap;
-      color:var(--muted);
-      font-size:12px;
-      margin-bottom:12px;
-    }
-
-    .legend span{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-    }
-
-    .dot{
-      width:12px;
-      height:12px;
-      border-radius:999px;
-      display:inline-block;
-    }
-
     .heat-wrap{
       overflow:auto;
       border-radius:14px;
@@ -469,7 +502,7 @@
     .c0{ background:rgba(59,184,255,.10); }
     .c1{ background:rgba(0,208,132,.14); }
     .c2{ background:rgba(255,200,87,.18); }
-    .c3{ background:rgba(255,155,47,.22); }
+    .c3{ background:rgba(249,115,22,.22); }
     .c4{ background:rgba(255,95,95,.20); }
 
     .footnote{
@@ -486,21 +519,13 @@
       line-height:1.5;
     }
 
-    .error{
-      color:#ffc6c6;
-    }
-
-    .success{
-      color:#9dffd1;
-    }
-
-    .hidden{
-      display:none !important;
-    }
+    .error{ color:#ffc6c6; }
+    .success{ color:#9dffd1; }
+    .hidden{ display:none !important; }
 
     @media (max-width:1320px){
       .cards{grid-template-columns:repeat(3,1fr)}
-      .grid-2,.grid-2b{grid-template-columns:1fr}
+      .narrative-grid,.grid-2b{grid-template-columns:1fr}
       .filters{grid-template-columns:repeat(2,1fr)}
     }
 
@@ -510,7 +535,6 @@
       .cards{grid-template-columns:1fr}
       .filters{grid-template-columns:1fr}
       .mini-grid{grid-template-columns:1fr}
-      .hero-v{font-size:36px}
     }
   </style>
 </head>
@@ -521,7 +545,7 @@
         <img id="brandLogo" alt="Logo" />
         <div class="brand-text">
           <div><strong>COMLURB</strong></div>
-          <div>Modelo HTML + GitHub Pages</div>
+          <div>Painel Executivo SME · HTML + GitHub Pages</div>
         </div>
       </div>
 
@@ -540,7 +564,15 @@
       </div>
 
       <div class="filter">
-        <label for="fMes">Mês</label>
+        <label for="fModo">Modo</label>
+        <select id="fModo">
+          <option value="ytd">YTD</option>
+          <option value="mes">Mês isolado</option>
+        </select>
+      </div>
+
+      <div class="filter">
+        <label for="fMes">Mês de referência</label>
         <select id="fMes"></select>
       </div>
 
@@ -573,14 +605,14 @@
         <div class="card-label">Faturamento operacional</div>
         <div class="card-value" id="kpiFatOp">R$ 0</div>
         <div class="chip green" id="kpiFatOpChip">valor realizado</div>
-        <div class="card-note">Usa a coluna de faturamento operacional da base. Se não existir, calcula bruto menos retroativo.</div>
+        <div class="card-note">Usa o faturamento operacional ou calcula bruto menos retroativo.</div>
       </article>
 
       <article class="card" style="--accent:var(--orange)">
         <div class="card-label">Glosa operacional</div>
         <div class="card-value" id="kpiGlosa">R$ 0</div>
         <div class="chip orange" id="kpiGlosaChip">0,0%</div>
-        <div class="card-note">Diferença entre contratado e faturamento operacional ou coluna de glosa da base.</div>
+        <div class="card-note">Diferença entre contratado e faturamento operacional.</div>
       </article>
 
       <article class="card" style="--accent:var(--green)">
@@ -594,7 +626,7 @@
         <div class="card-label" id="kpiDiaLabel">Valor dia</div>
         <div class="card-value" id="kpiDia">R$ 0</div>
         <div class="chip blue" id="kpiDiaChip">base 30 dias</div>
-        <div class="card-note" id="kpiDiaNote">Na visão executiva, usa referência 30 dias.</div>
+        <div class="card-note" id="kpiDiaNote">Na visão executiva, usa a referência 30 dias.</div>
       </article>
 
       <article class="card" style="--accent:var(--red)">
@@ -605,22 +637,19 @@
       </article>
     </section>
 
-    <section class="grid-2">
-      <div class="box">
-        <h3 class="section-title" id="heroTitleTop">Leitura principal do método selecionado</h3>
-        <div class="tabs" id="heroTabs">
-          <button class="tab active" data-hero="fat">Faturamento</button>
-          <button class="tab" data-hero="glosa">% Glosa</button>
-          <button class="tab" data-hero="faltas">Faltas</button>
-          <button class="tab" data-hero="media">Média / dia</button>
+    <section class="narrative-grid">
+      <div class="box narrative-card">
+        <div class="narrative-head">
+          <div>
+            <h3 class="section-title" style="margin-bottom:6px;">Leitura executiva do período</h3>
+            <div class="combo-sub" id="narrativeSub">Síntese automática da seleção atual.</div>
+          </div>
+          <div class="narrative-status status-ok" id="narrativeStatus">Situação controlada</div>
         </div>
-
-        <div class="hero">
-          <div class="hero-k" id="heroK">Faturamento operacional</div>
-          <div class="hero-v" id="heroV">R$ 0</div>
-          <div class="chip green" id="heroChip">base do período</div>
-          <div class="hero-foot" id="heroFoot">Leitura consolidada com base no filtro atual.</div>
-          <div class="hero-sub" id="heroSub">Na visão executiva, o painel prioriza leitura mais simples. Na técnica, os rótulos passam a refletir o valor real.</div>
+        <div class="bullets">
+          <div class="bullet" id="bullet1">As 3 piores CREs concentram 0% da glosa do período.</div>
+          <div class="bullet" id="bullet2">A glosa do período está em R$ 0, com execução de 0,0%.</div>
+          <div class="bullet" id="bullet3">A média de faltas/dia está em 0,0 no recorte selecionado.</div>
         </div>
       </div>
 
@@ -636,7 +665,7 @@
           <div class="mini">
             <div class="k">Período</div>
             <div class="v" id="miniPeriodo">Todos</div>
-            <div class="s">Ano, mês e unidade escolhidos nos filtros.</div>
+            <div class="s">Ano, modo, mês e unidade escolhidos nos filtros.</div>
           </div>
 
           <div class="mini">
@@ -648,19 +677,40 @@
           <div class="mini">
             <div class="k">Média de faltas / dia</div>
             <div class="v" id="miniMediaFaltas">0</div>
-            <div class="s">Incluída para deixar a leitura mais completa.</div>
+            <div class="s">Indicador principal de ausência para gestão.</div>
           </div>
         </div>
       </div>
     </section>
 
+    <section class="box">
+      <div class="combo-head">
+        <div>
+          <h3 class="section-title">Contratado × Faturado · Glosa</h3>
+          <div class="combo-sub" id="comboSub">Comparação do período selecionado</div>
+        </div>
+
+        <div class="combo-badges">
+          <span class="combo-badge hidden" id="badgeRetroativo">Período com retroativo</span>
+        </div>
+      </div>
+
+      <div class="combo-chart-wrap">
+        <canvas id="comboChart"></canvas>
+      </div>
+
+      <div class="combo-foot" id="comboFoot">
+        Colunas: contratado e faturamento operacional · Linha: glosa em R$
+      </div>
+    </section>
+
     <section class="grid-2b">
       <div class="box">
-        <h3 class="section-title" id="chartTitle">Evolução mensal</h3>
+        <h3 class="section-title" id="chartTitle">Tendência mensal</h3>
         <div class="tabs" id="chartTabs">
           <button class="tab active" data-chart="fat">Faturamento</button>
           <button class="tab" data-chart="glosa">Glosa</button>
-          <button class="tab" data-chart="faltas">Faltas</button>
+          <button class="tab" data-chart="glosapct">% Glosa</button>
           <button class="tab" data-chart="media">Média / dia</button>
         </div>
         <div class="bar-chart" id="barChart"></div>
@@ -668,7 +718,7 @@
       </div>
 
       <div class="box">
-        <h3 class="section-title">Regiões com mais descontos</h3>
+        <h3 class="section-title">Top CREs por glosa</h3>
         <div class="table-wrap">
           <table>
             <thead>
@@ -689,21 +739,12 @@
     </section>
 
     <section class="box">
-      <h3 class="section-title">Mapa de calor · todas as unidades</h3>
+      <h3 class="section-title">Mapa de calor · média de faltas / dia</h3>
 
       <div class="tabs" id="heatTabs">
-        <button class="tab active" data-heat="faltas">Faltas</button>
-        <button class="tab" data-heat="media">Média / dia</button>
-        <button class="tab" data-heat="taxa">Taxa (%)</button>
+        <button class="tab active" data-heat="media">Média / dia</button>
+        <button class="tab" data-heat="taxa">% Glosa</button>
         <button class="tab" data-heat="glosa">Glosa (R$)</button>
-      </div>
-
-      <div class="legend">
-        <span><i class="dot" style="background:#2a64b8"></i>Muito baixo</span>
-        <span><i class="dot" style="background:#00d084"></i>Baixo</span>
-        <span><i class="dot" style="background:#ffc857"></i>Moderado</span>
-        <span><i class="dot" style="background:#ff9b2f"></i>Alto</span>
-        <span><i class="dot" style="background:#ff5f5f"></i>Crítico</span>
       </div>
 
       <div class="heat-wrap">
@@ -720,49 +761,33 @@
   </div>
 
   <script>
-    /******************************************************************
-     * 1) CONFIGURAÇÃO
-     ******************************************************************/
     const CSV_URLS = [
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_pOHwnQ8u94Wd56llh_YaJko5gT2fM8A9YeMvd3XyRfgFec9Yjhe7jI-wVskFg2nC3RFVHyvWRJCa/pub?gid=1856807338&output=csv",
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_pOHwnQ8u94Wd56llh_YaJko5gT2fM8A9YeMvd3XyRfgFec9Yjhe7jI-wVskFg2nC3RFVHyvWRJCa/pub?gid=1856807338&single=true&output=csv"
     ];
-
     const LOGO_URL = "./RIOPREFEITURA Comlurb horizontal monocromatica branca.png";
 
-    /******************************************************************
-     * 2) ESTADO GLOBAL
-     ******************************************************************/
     const MESES = [
-      { num: 1, nome: "Jan" },
-      { num: 2, nome: "Fev" },
-      { num: 3, nome: "Mar" },
-      { num: 4, nome: "Abr" },
-      { num: 5, nome: "Mai" },
-      { num: 6, nome: "Jun" },
-      { num: 7, nome: "Jul" },
-      { num: 8, nome: "Ago" },
-      { num: 9, nome: "Set" },
-      { num: 10, nome: "Out" },
-      { num: 11, nome: "Nov" },
-      { num: 12, nome: "Dez" }
+      { num: 1, nome: "Jan" }, { num: 2, nome: "Fev" }, { num: 3, nome: "Mar" },
+      { num: 4, nome: "Abr" }, { num: 5, nome: "Mai" }, { num: 6, nome: "Jun" },
+      { num: 7, nome: "Jul" }, { num: 8, nome: "Ago" }, { num: 9, nome: "Set" },
+      { num: 10, nome: "Out" }, { num: 11, nome: "Nov" }, { num: 12, nome: "Dez" }
     ];
 
     const state = {
       raw: [],
       filtered: [],
-      heroMetric: "fat",
       chartMetric: "fat",
-      heatMetric: "faltas"
+      heatMetric: "media"
     };
 
-    /******************************************************************
-     * 3) ELEMENTOS
-     ******************************************************************/
+    let comboChartInstance = null;
+
     const statusMsg = document.getElementById("statusMsg");
     const brandLogo = document.getElementById("brandLogo");
 
     const fAno = document.getElementById("fAno");
+    const fModo = document.getElementById("fModo");
     const fMes = document.getElementById("fMes");
     const fUnidade = document.getElementById("fUnidade");
     const fVisao = document.getElementById("fVisao");
@@ -791,38 +816,25 @@
     const kpiFaltasChip = document.getElementById("kpiFaltasChip");
     const kpiFaltasNote = document.getElementById("kpiFaltasNote");
 
-    const heroTitleTop = document.getElementById("heroTitleTop");
-    const heroK = document.getElementById("heroK");
-    const heroV = document.getElementById("heroV");
-    const heroChip = document.getElementById("heroChip");
-    const heroFoot = document.getElementById("heroFoot");
-    const heroSub = document.getElementById("heroSub");
+    const narrativeSub = document.getElementById("narrativeSub");
+    const narrativeStatus = document.getElementById("narrativeStatus");
+    const bullet1 = document.getElementById("bullet1");
+    const bullet2 = document.getElementById("bullet2");
+    const bullet3 = document.getElementById("bullet3");
 
     const chartTitle = document.getElementById("chartTitle");
     const chartFoot = document.getElementById("chartFoot");
     const barChart = document.getElementById("barChart");
     const rankingBody = document.getElementById("rankingBody");
-
     const heatHeadRow = document.getElementById("heatHeadRow");
     const heatBody = document.getElementById("heatBody");
 
-    /******************************************************************
-     * 4) UTILITÁRIOS
-     ******************************************************************/
     function toNumber(v) {
       if (v === null || v === undefined || v === "") return 0;
       if (typeof v === "number") return isFinite(v) ? v : 0;
-
       let s = String(v).trim();
       if (!s) return 0;
-
-      s = s
-        .replace(/R\$/gi, "")
-        .replace(/\s/g, "")
-        .replace(/\./g, "")
-        .replace(/,/g, ".")
-        .replace(/%/g, "");
-
+      s = s.replace(/R\$/gi, "").replace(/\s/g, "").replace(/\./g, "").replace(/,/g, ".").replace(/%/g, "");
       const n = parseFloat(s);
       return isFinite(n) ? n : 0;
     }
@@ -855,9 +867,7 @@
       return found ? found.nome : "";
     }
 
-    function safeDivide(a, b) {
-      return b ? a / b : 0;
-    }
+    function safeDivide(a, b) { return b ? a / b : 0; }
 
     function escapeHtml(text) {
       return String(text)
@@ -903,116 +913,45 @@
       return 0;
     }
 
-    /******************************************************************
-     * 5) NORMALIZAÇÃO DA BASE
-     ******************************************************************/
     function normalizeRow(row) {
-      const ano = Number(firstNonZero([
-        getField(row, ["Ano", "ano"])
-      ]));
+      const ano = Number(firstNonZero([getField(row, ["Ano", "ano"])]));
+      const mesNum = Number(firstNonZero([getField(row, ["Mês_Num", "Mes_Num", "MesNum", "MêsNum", "mes_num", "mesnum"])]));
+      const mes = String(getField(row, ["Mês", "Mes", "mes"]) || monthNameByNum(mesNum)).trim();
+      const unidade = String(getField(row, ["Unidade", "CRE", "Unidade/CRE", "unidade"])).replace(/^\uFEFF/, "").trim() || "Sem unidade";
 
-      const mesNum = Number(firstNonZero([
-        getField(row, ["Mês_Num", "Mes_Num", "MesNum", "MêsNum", "mes_num", "mesnum"])
-      ]));
+      const contratado = toNumber(getField(row, ["Valor_Contratado", "Valor Contratado", "Contratado"]));
+      const bruto = toNumber(getField(row, ["Faturamento_Bruto", "Faturamento Bruto", "Bruto"]));
+      const retroativo = toNumber(getField(row, ["Retroativo"]));
 
-      const mes = String(
-        getField(row, ["Mês", "Mes", "mes"]) || monthNameByNum(mesNum)
-      ).trim();
+      let fatOperacional = toNumber(getField(row, ["Fat_Operacional", "Faturamento_Operacional", "Fat Operacional", "Faturamento Operacional"]));
+      if (!fatOperacional) fatOperacional = bruto - retroativo;
 
-      const unidade = String(
-        getField(row, ["Unidade", "CRE", "Unidade/CRE", "unidade"])
-      ).replace(/^\uFEFF/, "").trim() || "Sem unidade";
+      let glosaOperacional = toNumber(getField(row, ["Glosa_Operacional", "Glosa Operacional"]));
+      if (!glosaOperacional) glosaOperacional = Math.max(0, contratado - fatOperacional);
 
-      const contratado = toNumber(getField(row, [
-        "Valor_Contratado", "Valor Contratado", "Contratado"
-      ]));
+      const postos = toNumber(getField(row, ["Postos", "Posto", "Qtd_Postos", "Quantidade_Postos"]));
+      const diasMes = toNumber(getField(row, ["Dias_Mês", "Dias_Mes", "Dias Mes", "dias_mes"])) || 30;
+      const faltasReais = toNumber(getField(row, ["Faltas_Reais", "Faltas Reais", "Faltas"]));
 
-      const bruto = toNumber(getField(row, [
-        "Faturamento_Bruto", "Faturamento Bruto", "Bruto"
-      ]));
-
-      const retroativo = toNumber(getField(row, [
-        "Retroativo"
-      ]));
-
-      let fatOperacional = toNumber(getField(row, [
-        "Fat_Operacional", "Faturamento_Operacional", "Fat Operacional", "Faturamento Operacional"
-      ]));
-
-      if (!fatOperacional) {
-        fatOperacional = bruto - retroativo;
-      }
-
-      let glosaOperacional = toNumber(getField(row, [
-        "Glosa_Operacional", "Glosa Operacional"
-      ]));
-
-      if (!glosaOperacional) {
-        glosaOperacional = Math.max(0, contratado - fatOperacional);
-      }
-
-      const postos = toNumber(getField(row, [
-        "Postos", "Posto", "Qtd_Postos", "Quantidade_Postos"
-      ]));
-
-      const diasMes = toNumber(getField(row, [
-        "Dias_Mês", "Dias_Mes", "Dias Mes", "dias_mes"
-      ])) || 30;
-
-      const faltasReais = toNumber(getField(row, [
-        "Faltas_Reais", "Faltas Reais", "Faltas"
-      ]));
-
-      let glosaPct = toNumber(getField(row, [
-        "Glosa_%", "Glosa %", "Glosa%", "Perc_Glosa", "% Glosa"
-      ]));
-
-      if (glosaPct && Math.abs(glosaPct) < 1) {
-        glosaPct = glosaPct * 100;
-      }
-
-      if (!glosaPct && contratado) {
-        glosaPct = safeDivide(glosaOperacional, contratado) * 100;
-      }
+      let glosaPct = toNumber(getField(row, ["Glosa_%", "Glosa %", "Glosa%", "Perc_Glosa", "% Glosa"]));
+      if (glosaPct && Math.abs(glosaPct) < 1) glosaPct = glosaPct * 100;
+      if (!glosaPct && contratado) glosaPct = safeDivide(glosaOperacional, contratado) * 100;
 
       return {
-        ano,
-        mesNum,
-        mes: mes || monthNameByNum(mesNum),
-        unidade,
-        contratado,
-        bruto,
-        retroativo,
-        fatOperacional,
-        glosaOperacional,
-        postos,
-        diasMes,
-        faltasReais,
-        glosaPct,
-        _raw: row
+        ano, mesNum, mes: mes || monthNameByNum(mesNum), unidade,
+        contratado, bruto, retroativo, fatOperacional, glosaOperacional,
+        postos, diasMes, faltasReais, glosaPct, _raw: row
       };
     }
 
-    /******************************************************************
-     * 6) CARGA ONLINE DO CSV
-     ******************************************************************/
     function handleParsedData(results, sourceLabel) {
       if (!results || !results.data || !results.data.length) {
         throw new Error(`Sem dados em ${sourceLabel}`);
       }
 
-      console.log("✅ Fonte carregada:", sourceLabel);
-      console.log("✅ Colunas do CSV:", Object.keys(results.data[0] || {}));
-      console.log("✅ Primeira linha bruta:", results.data[0]);
-
       const rows = (results.data || [])
         .map(normalizeRow)
         .filter(r => r.ano && r.unidade && r.unidade !== "Sem unidade");
-
-      console.log("✅ Linhas normalizadas válidas:", rows.length);
-      if (rows[0]) {
-        console.log("✅ Primeira linha normalizada:", rows[0]);
-      }
 
       if (!rows.length) {
         throw new Error("A planilha foi lida, mas não retornou linhas válidas após a normalização.");
@@ -1028,92 +967,50 @@
       const results = Papa.parse(csvText, {
         header: true,
         skipEmptyLines: true,
-        transformHeader: function(header) {
-          return String(header)
-            .replace(/^\uFEFF/, "")
-            .trim();
-        }
+        transformHeader: header => String(header).replace(/^\uFEFF/, "").trim()
       });
-
       handleParsedData(results, sourceLabel);
     }
 
     async function loadData() {
       try {
         brandLogo.src = LOGO_URL || "";
-        brandLogo.onerror = () => {
-          brandLogo.classList.add("hidden");
-        };
-
+        brandLogo.onerror = () => brandLogo.classList.add("hidden");
         statusMsg.textContent = "Carregando base online...";
-        const errors = [];
 
+        const errors = [];
         for (const url of CSV_URLS) {
           try {
-            console.log("🔎 Tentando carregar CSV via fetch:", url);
-
-            const response = await fetch(url, {
-              method: "GET",
-              cache: "no-store"
-            });
-
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-            }
-
+            const response = await fetch(url, { method: "GET", cache: "no-store" });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const csvText = await response.text();
-
-            if (!csvText || !csvText.trim()) {
-              throw new Error("CSV vazio");
-            }
-
+            if (!csvText || !csvText.trim()) throw new Error("CSV vazio");
             parseCsvText(csvText, `fetch: ${url}`);
             return;
           } catch (fetchErr) {
-            const detail = fetchErr && fetchErr.message ? fetchErr.message : String(fetchErr);
-            errors.push(`Fetch falhou em ${url}: ${detail}`);
-            console.warn("⚠️ Falha no fetch direto:", url, fetchErr);
-
+            errors.push(`Fetch falhou em ${url}: ${fetchErr?.message || fetchErr}`);
             try {
               await new Promise((resolve, reject) => {
                 Papa.parse(url, {
                   download: true,
                   header: true,
                   skipEmptyLines: true,
-                  downloadRequestHeaders: {
-                    "Cache-Control": "no-cache"
+                  downloadRequestHeaders: { "Cache-Control": "no-cache" },
+                  transformHeader: header => String(header).replace(/^\uFEFF/, "").trim(),
+                  complete: results => {
+                    try { handleParsedData(results, `papaparse: ${url}`); resolve(); }
+                    catch (e) { reject(e); }
                   },
-                  transformHeader: function(header) {
-                    return String(header)
-                      .replace(/^\uFEFF/, "")
-                      .trim();
-                  },
-                  complete: function(results) {
-                    try {
-                      handleParsedData(results, `papaparse: ${url}`);
-                      resolve();
-                    } catch (parseErr) {
-                      reject(parseErr);
-                    }
-                  },
-                  error: function(err) {
-                    reject(err || new Error("PapaParse download falhou"));
-                  }
+                  error: err => reject(err || new Error("PapaParse download falhou"))
                 });
               });
-
               return;
             } catch (papaErr) {
-              const papaDetail = papaErr && papaErr.message ? papaErr.message : String(papaErr);
-              errors.push(`PapaParse falhou em ${url}: ${papaDetail}`);
-              console.warn("⚠️ Falha no PapaParse:", url, papaErr);
+              errors.push(`PapaParse falhou em ${url}: ${papaErr?.message || papaErr}`);
             }
           }
         }
-
-        showError(
-          "Não foi possível carregar o CSV online. Verifique se a planilha está publicada em CSV e se o link abre diretamente no navegador. Veja detalhes no console (F12)."
-        );
+        showError("Não foi possível carregar o CSV online. Verifique se a planilha está publicada em CSV e se o link abre diretamente no navegador. Veja detalhes no console (F12).");
         console.error("❌ Todas as tentativas falharam:", errors);
       } catch (err) {
         showError(err.message || String(err));
@@ -1124,9 +1021,6 @@
       statusMsg.innerHTML = `<span class="error">${escapeHtml(message)}</span>`;
     }
 
-    /******************************************************************
-     * 7) FILTROS
-     ******************************************************************/
     function buildFilters() {
       const anos = unique(state.raw.map(r => r.ano)).sort((a,b) => b - a);
       const unidades = unique(state.raw.map(r => r.unidade)).sort((a,b) => a.localeCompare(b, "pt-BR"));
@@ -1135,31 +1029,41 @@
       fMes.innerHTML = `<option value="Todos">Todos</option>` + MESES.map(m => `<option value="${m.num}">${m.nome}</option>`).join("");
       fUnidade.innerHTML = `<option value="Todas">Todas</option>` + unidades.map(u => `<option value="${escapeHtml(u)}">${escapeHtml(u)}</option>`).join("");
 
-      if (anos.length) {
-        fAno.value = String(anos[0]);
-      }
+      if (anos.length) fAno.value = String(anos[0]);
       fMes.value = "Todos";
       fUnidade.value = "Todas";
+      fModo.value = "ytd";
+      fVisao.value = "30d";
+    }
+
+    function getMesReferencia() { return fMes.value; }
+
+    function getFilteredRowsByModo() {
+      const ano = fAno.value;
+      const unidade = fUnidade.value;
+      const modo = fModo.value;
+      const mesRef = getMesReferencia();
+
+      let rows = state.raw.filter(r => {
+        const okAno = ano === "Todos" || String(r.ano) === String(ano);
+        const okUnidade = unidade === "Todas" || r.unidade === unidade;
+        return okAno && okUnidade;
+      });
+
+      if (modo === "mes") {
+        if (mesRef !== "Todos") rows = rows.filter(r => String(r.mesNum) === String(mesRef));
+      } else {
+        if (mesRef !== "Todos") rows = rows.filter(r => Number(r.mesNum) <= Number(mesRef));
+      }
+
+      return rows;
     }
 
     function applyFilters() {
-      const ano = fAno.value;
-      const mes = fMes.value;
-      const unidade = fUnidade.value;
-
-      state.filtered = state.raw.filter(r => {
-        const okAno = ano === "Todos" || String(r.ano) === String(ano);
-        const okMes = mes === "Todos" || String(r.mesNum) === String(mes);
-        const okUnidade = unidade === "Todas" || r.unidade === unidade;
-        return okAno && okMes && okUnidade;
-      });
-
+      state.filtered = getFilteredRowsByModo();
       renderAll();
     }
 
-    /******************************************************************
-     * 8) AGREGAÇÕES
-     ******************************************************************/
     function summarize(rows) {
       const contratado = rows.reduce((s, r) => s + r.contratado, 0);
       const fatOperacional = rows.reduce((s, r) => s + r.fatOperacional, 0);
@@ -1170,7 +1074,6 @@
       const exposure30 = rows.reduce((s, r) => s + (r.postos * 30), 0);
 
       const mesesDistintos = new Set(rows.map(r => `${r.ano}-${r.mesNum}`)).size || 1;
-
       const diasReaisDistintos = (() => {
         const seen = new Map();
         rows.forEach(r => {
@@ -1182,80 +1085,46 @@
 
       const execucaoPct = safeDivide(fatOperacional, contratado) * 100;
       const glosaPct = safeDivide(glosa, contratado) * 100;
-
       const valorDia30 = safeDivide(fatOperacional, exposure30);
       const valorDiaReal = safeDivide(fatOperacional, exposureReal);
-
       const mediaFaltasDia30 = safeDivide(faltas, mesesDistintos * 30);
       const mediaFaltasDia = safeDivide(faltas, diasReaisDistintos);
+      const retroativoTotal = rows.reduce((s, r) => s + (r.retroativo || 0), 0);
 
       return {
-        contratado,
-        fatOperacional,
-        glosa,
-        faltas,
-        exposureReal,
-        exposure30,
-        execucaoPct,
-        glosaPct,
-        valorDia30,
-        valorDiaReal,
-        mediaFaltasDia,
-        mediaFaltasDia30
+        contratado, fatOperacional, glosa, faltas, exposureReal, exposure30,
+        execucaoPct, glosaPct, valorDia30, valorDiaReal,
+        mediaFaltasDia, mediaFaltasDia30, retroativoTotal
       };
     }
 
     function groupedByUnit(rows) {
       const map = new Map();
-
       rows.forEach(r => {
         const key = r.unidade;
         if (!map.has(key)) map.set(key, []);
         map.get(key).push(r);
       });
-
-      return [...map.entries()].map(([unidade, items]) => {
-        const s = summarize(items);
-        return { unidade, ...s };
-      });
+      return [...map.entries()].map(([unidade, items]) => ({ unidade, ...summarize(items) }));
     }
 
-    function groupedByMonth(rows) {
+    function groupedByMonth(rows, yearForGrouping = null) {
+      const source = yearForGrouping ? rows.filter(r => r.ano === yearForGrouping) : rows;
       return MESES.map(m => {
-        const items = rows.filter(r => r.mesNum === m.num);
-        const s = summarize(items);
-        return {
-          mesNum: m.num,
-          mes: m.nome,
-          ...s
-        };
+        const items = source.filter(r => r.mesNum === m.num);
+        return { mesNum: m.num, mes: m.nome, ...summarize(items) };
       });
-    }
-
-    /******************************************************************
-     * 9) RENDER GERAL
-     ******************************************************************/
-    function renderAll() {
-      updateViewLabels();
-      renderKPIs();
-      renderHero();
-      renderSummary();
-      renderRanking();
-      renderBarChart();
-      renderHeatmap();
     }
 
     function updateViewLabels() {
       const is30d = fVisao.value === "30d";
-
       viewTag.textContent = is30d ? "Oficial / Executivo = 30 dias" : "Oficial / Técnico = valor real";
       miniVisao.textContent = is30d ? "Executivo · 30 dias" : "Técnico · Real";
-      heroTitleTop.textContent = is30d ? "Leitura principal do método selecionado" : "Leitura técnica do método selecionado";
 
       if (is30d) {
         kpiDiaLabel.textContent = "Valor dia";
         kpiDiaChip.textContent = "base 30 dias";
-        kpiDiaNote.textContent = "Na visão executiva, usa a referência do valor-dia em base 30 (divisor fixo contratual).";
+        kpiDiaNote.textContent = "Na visão executiva, usa a referência do valor-dia em base 30.";
         kpiFaltaLabel.textContent = "Média de faltas / dia";
         kpiFaltasNote.textContent = "Média diária de faltas no período — base executiva (30 dias/mês).";
       } else {
@@ -1263,7 +1132,7 @@
         kpiDiaChip.textContent = "dias reais";
         kpiDiaNote.textContent = "Na visão técnica, usa os dias reais do mês no denominador.";
         kpiFaltaLabel.textContent = "Média de faltas / dia";
-        kpiFaltasNote.textContent = "Média diária de faltas no período — base técnica com dias reais do mês.";
+        kpiFaltasNote.textContent = "Média diária de faltas no período — base técnica com dias reais.";
       }
     }
 
@@ -1273,100 +1142,224 @@
 
       kpiContratado.textContent = brl(s.contratado);
       kpiContratadoChip.textContent = `${state.filtered.length} linha(s) da base`;
-
       kpiFatOp.textContent = brl(s.fatOperacional);
-      kpiFatOpChip.textContent = is30d ? "operacional do período" : "valor realizado";
-
+      kpiFatOpChip.textContent = "operacional do período";
       kpiGlosa.textContent = brl(s.glosa);
       kpiGlosaChip.textContent = pct(s.glosaPct);
-
       kpiExecucao.textContent = pct(s.execucaoPct);
       kpiExecucaoChip.textContent = "contratado x realizado";
-
       kpiDia.textContent = brl(is30d ? s.valorDia30 : s.valorDiaReal);
       kpiFaltasChip.textContent = is30d ? "base 30 dias" : "dias reais";
       kpiFaltas.textContent = num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1);
-    }
-
-    function renderHero() {
-      const s = summarize(state.filtered);
-      const is30d = fVisao.value === "30d";
-
-      const content = {
-        fat: {
-          k: "Faturamento operacional",
-          v: brl(s.fatOperacional),
-          chip: is30d ? pct(s.execucaoPct) + " de execução" : "valor realizado",
-          foot: "Leitura financeira consolidada do período filtrado.",
-          sub: is30d
-            ? "Na visão executiva, a tela privilegia leitura mais direta."
-            : "Na visão técnica, a nomenclatura acompanha a leitura real do período."
-        },
-        glosa: {
-          k: is30d ? "% glosa operacional" : "% glosa real",
-          v: pct(s.glosaPct),
-          chip: is30d ? "comparação com contratado" : "apuração técnica",
-          foot: "Percentual de desconto dentro da seleção atual.",
-          sub: "Essa leitura ajuda a identificar rapidamente onde o contrato está mais pressionado."
-        },
-        faltas: {
-          k: "Média de faltas / dia",
-          v: num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1),
-          chip: is30d ? "base 30 dias" : "dias reais",
-          foot: is30d
-            ? "Média diária de faltas no período — base executiva (mês = 30 dias)."
-            : "Média diária de faltas com os dias reais do período.",
-          sub: is30d
-            ? "Na visão executiva, cada mês conta como 30 dias no denominador."
-            : "Na visão técnica, o denominador usa os dias reais de cada mês."
-        },
-        media: {
-          k: "Média de faltas / dia",
-          v: num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1),
-          chip: is30d ? "base executiva · 30 dias" : "base real",
-          foot: "Média de faltas por dia dentro do período filtrado.",
-          sub: "Entrou para facilitar a leitura da seleção e apoiar a análise por unidade."
-        }
-      };
-
-      const c = content[state.heroMetric];
-      heroK.textContent = c.k;
-      heroV.textContent = c.v;
-      heroChip.textContent = c.chip;
-      heroFoot.textContent = c.foot;
-      heroSub.textContent = c.sub;
     }
 
     function renderSummary() {
       const s = summarize(state.filtered);
       const is30d = fVisao.value === "30d";
       const ano = fAno.value === "Todos" ? "Todos os anos" : fAno.value;
-      const mes = fMes.value === "Todos" ? "Todos os meses" : monthNameByNum(fMes.value);
+      const mes = fMes.value === "Todos" ? "todos os meses" : monthNameByNum(fMes.value);
+      const modo = fModo.value === "ytd" ? "YTD" : "Mês isolado";
       const unidade = fUnidade.value === "Todas" ? "Todas as unidades" : fUnidade.value;
 
-      miniPeriodo.textContent = `${mes} · ${ano}`;
+      miniPeriodo.textContent = `${modo} · ${mes} · ${ano}`;
       miniGlosa.textContent = brl(s.glosa);
       miniMediaFaltas.textContent = num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1);
+      if (fUnidade.value !== "Todas") miniPeriodo.textContent = `${modo} · ${mes} · ${ano} · ${unidade}`;
+    }
 
-      if (fUnidade.value !== "Todas") {
-        miniPeriodo.textContent = `${mes} · ${ano} · ${unidade}`;
+    function renderNarrative() {
+      const s = summarize(state.filtered);
+      const byUnit = groupedByUnit(state.filtered).sort((a,b) => b.glosa - a.glosa);
+      const top3 = byUnit.slice(0,3);
+      const concentracao = safeDivide(top3.reduce((acc, r) => acc + r.glosa, 0), s.glosa) * 100;
+      const is30d = fVisao.value === "30d";
+      const media = is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia;
+      const periodoTxt = fModo.value === "ytd"
+        ? `acumulado até ${fMes.value === "Todos" ? "o último mês disponível" : monthNameByNum(fMes.value)}`
+        : `mês de ${fMes.value === "Todos" ? "referência aberta" : monthNameByNum(fMes.value)}`;
+
+      narrativeSub.textContent = `Ano ${fAno.value === "Todos" ? "mais recente" : fAno.value} · ${periodoTxt}`;
+
+      narrativeStatus.className = "narrative-status";
+      if (s.glosaPct >= 8 || media >= 3) {
+        narrativeStatus.classList.add("status-crit");
+        narrativeStatus.textContent = "Situação crítica";
+      } else if (s.glosaPct >= 4 || media >= 1.5) {
+        narrativeStatus.classList.add("status-att");
+        narrativeStatus.textContent = "Situação de atenção";
+      } else {
+        narrativeStatus.classList.add("status-ok");
+        narrativeStatus.textContent = "Situação controlada";
       }
+
+      bullet1.textContent = `As 3 piores CREs concentram ${pct(concentracao || 0)} da glosa do período.`;
+      bullet2.textContent = `A glosa do período está em ${brl(s.glosa)}, com execução de ${pct(s.execucaoPct)}.`;
+      bullet3.textContent = s.retroativoTotal > 0
+        ? `A média de faltas/dia está em ${num(media,1)} e houve impacto de retroativo de ${brl(s.retroativoTotal)} no período.`
+        : `A média de faltas/dia está em ${num(media,1)} no recorte selecionado.`;
+    }
+
+    function buildComboChartData() {
+      const anoSelecionado = fAno.value === "Todos"
+        ? Math.max(...state.raw.map(r => r.ano))
+        : Number(fAno.value);
+
+      const modo = fModo.value;
+      const mesRef = getMesReferencia();
+      const unidade = fUnidade.value;
+
+      const base = state.raw.filter(r => {
+        const okAno = r.ano === anoSelecionado;
+        const okUnidade = unidade === "Todas" || r.unidade === unidade;
+        return okAno && okUnidade;
+      });
+
+      let mesesConsiderados = MESES;
+      if (modo === "ytd" && mesRef !== "Todos") mesesConsiderados = MESES.filter(m => m.num <= Number(mesRef));
+      if (modo === "mes" && mesRef !== "Todos") mesesConsiderados = MESES.filter(m => m.num === Number(mesRef));
+
+      const labels = [], contratadoData = [], faturadoData = [], glosaData = [], glosaPctData = [], retroativoFlags = [];
+
+      mesesConsiderados.forEach(m => {
+        const rowsMes = base.filter(r => r.mesNum === m.num);
+        const s = summarize(rowsMes);
+        labels.push(m.nome);
+        contratadoData.push(s.contratado);
+        faturadoData.push(s.fatOperacional);
+        glosaData.push(s.glosa);
+        glosaPctData.push(s.glosaPct);
+        retroativoFlags.push(s.retroativoTotal > 0);
+      });
+
+      return { anoSelecionado, modo, mesRef, unidade, labels, contratadoData, faturadoData, glosaData, glosaPctData, retroativoFlags };
+    }
+
+    function renderComboChart() {
+      const canvas = document.getElementById("comboChart");
+      const badgeRetroativo = document.getElementById("badgeRetroativo");
+      const comboSub = document.getElementById("comboSub");
+      const comboFoot = document.getElementById("comboFoot");
+      if (!canvas || typeof Chart === "undefined") return;
+
+      const data = buildComboChartData();
+      const hasRetroativo = data.retroativoFlags.some(Boolean);
+      badgeRetroativo.classList.toggle("hidden", !hasRetroativo);
+
+      const mesTexto = data.mesRef === "Todos" ? "último mês disponível" : monthNameByNum(data.mesRef);
+      comboSub.textContent = data.modo === "ytd"
+        ? `Ano ${data.anoSelecionado} · acumulado até ${mesTexto}`
+        : `Ano ${data.anoSelecionado} · mês isolado: ${mesTexto}`;
+
+      comboFoot.textContent = data.unidade === "Todas"
+        ? "Colunas: contratado e faturamento operacional · Linha: glosa em R$ · Escopo: todas as CREs"
+        : `Colunas: contratado e faturamento operacional · Linha: glosa em R$ · Escopo: ${data.unidade}`;
+
+      if (comboChartInstance) comboChartInstance.destroy();
+
+      comboChartInstance = new Chart(canvas, {
+        type: "bar",
+        data: {
+          labels: data.labels,
+          datasets: [
+            {
+              type: "bar",
+              label: "Contratado",
+              data: data.contratadoData,
+              backgroundColor: "rgba(59,184,255,.70)",
+              borderColor: "rgba(59,184,255,1)",
+              borderWidth: 1,
+              yAxisID: "y"
+            },
+            {
+              type: "bar",
+              label: "Fat. Operacional",
+              data: data.faturadoData,
+              backgroundColor: "rgba(0,208,132,.65)",
+              borderColor: "rgba(0,208,132,1)",
+              borderWidth: 1,
+              yAxisID: "y"
+            },
+            {
+              type: "line",
+              label: "Glosa",
+              data: data.glosaData,
+              borderColor: "rgba(249,115,22,1)",
+              backgroundColor: "rgba(249,115,22,1)",
+              borderWidth: 3,
+              tension: 0.28,
+              pointRadius: 4,
+              pointHoverRadius: 5,
+              yAxisID: "y1"
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: "index", intersect: false },
+          plugins: {
+            legend: {
+              labels: {
+                color: "#dce9f6",
+                font: { weight: "700" }
+              }
+            },
+            tooltip: {
+              backgroundColor: "rgba(7,28,49,.96)",
+              borderColor: "rgba(255,255,255,.08)",
+              borderWidth: 1,
+              titleColor: "#ffffff",
+              bodyColor: "#dce9f6",
+              callbacks: {
+                label: function(context) {
+                  const idx = context.dataIndex;
+                  const datasetLabel = context.dataset.label || "";
+                  const raw = context.raw || 0;
+                  if (datasetLabel === "Glosa") return `${datasetLabel}: ${brl(raw)} (${pct(data.glosaPctData[idx])})`;
+                  return `${datasetLabel}: ${brl(raw)}`;
+                },
+                afterBody: function(items) {
+                  const idx = items[0]?.dataIndex ?? 0;
+                  return data.retroativoFlags[idx] ? ["Período com retroativo"] : [];
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: "#b6d3ea" },
+              grid: { color: "rgba(255,255,255,.04)" }
+            },
+            y: {
+              position: "left",
+              ticks: {
+                color: "#b6d3ea",
+                callback: value => brl(value)
+              },
+              grid: { color: "rgba(255,255,255,.06)" }
+            },
+            y1: {
+              position: "right",
+              ticks: {
+                color: "#ffd6ab",
+                callback: value => brl(value)
+              },
+              grid: { drawOnChartArea: false }
+            }
+          }
+        }
+      });
     }
 
     function renderRanking() {
-      const rows = groupedByUnit(state.filtered)
-        .sort((a, b) => b.glosaPct - a.glosaPct);
-
+      const rows = groupedByUnit(state.filtered).sort((a, b) => b.glosaPct - a.glosaPct).slice(0, 10);
       rankingBody.innerHTML = "";
-
       if (!rows.length) {
         rankingBody.innerHTML = `<tr><td colspan="6">Sem dados para a seleção atual.</td></tr>`;
         return;
       }
-
       rows.forEach(r => {
-        const is30d = fVisao.value === "30d";
-        const media = is30d ? r.mediaFaltasDia30 : r.mediaFaltasDia;
+        const media = fVisao.value === "30d" ? r.mediaFaltasDia30 : r.mediaFaltasDia;
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td><strong>${escapeHtml(r.unidade)}</strong></td>
@@ -1381,35 +1374,40 @@
     }
 
     function renderBarChart() {
-      const year = fAno.value === "Todos"
-        ? Math.max(...state.raw.map(r => r.ano))
-        : Number(fAno.value);
-
+      const year = fAno.value === "Todos" ? Math.max(...state.raw.map(r => r.ano)) : Number(fAno.value);
       const unit = fUnidade.value;
-      const base = state.raw.filter(r => r.ano === year && (unit === "Todas" || r.unidade === unit));
-      const monthRows = groupedByMonth(base);
+      const base = state.raw.filter(r => {
+        const okYear = r.ano === year;
+        const okUnit = unit === "Todas" || r.unidade === unit;
+        const okModo = fModo.value === "ytd"
+          ? (fMes.value === "Todos" || r.mesNum <= Number(fMes.value))
+          : (fMes.value === "Todos" || r.mesNum === Number(fMes.value));
+        return okYear && okUnit && okModo;
+      });
+
+      const monthRows = groupedByMonth(base, year);
 
       const metricMap = {
         fat: {
-          title: "Evolução mensal · faturamento operacional",
+          title: "Tendência mensal · faturamento operacional",
           foot: `Ano ${year} · leitura mensal do faturamento operacional`,
           getter: r => r.fatOperacional,
           formatter: v => brl(v)
         },
         glosa: {
-          title: "Evolução mensal · glosa operacional",
+          title: "Tendência mensal · glosa operacional",
           foot: `Ano ${year} · leitura mensal da glosa`,
           getter: r => r.glosa,
           formatter: v => brl(v)
         },
-        faltas: {
-          title: "Evolução mensal · faltas reais",
-          foot: `Ano ${year} · leitura mensal de faltas`,
-          getter: r => r.faltas,
-          formatter: v => num(v, 0)
+        glosapct: {
+          title: "Tendência mensal · % glosa",
+          foot: `Ano ${year} · leitura mensal da glosa percentual`,
+          getter: r => r.glosaPct,
+          formatter: v => pct(v)
         },
         media: {
-          title: "Evolução mensal · média de faltas / dia",
+          title: "Tendência mensal · média de faltas / dia",
           foot: `Ano ${year} · média diária por mês`,
           getter: r => fVisao.value === "30d" ? r.mediaFaltasDia30 : r.mediaFaltasDia,
           formatter: v => num(v, 1)
@@ -1427,7 +1425,6 @@
       monthRows.forEach(r => {
         const value = metric.getter(r);
         const h = 24 + (value / max) * 165;
-
         const col = document.createElement("div");
         col.className = "bar-col";
         col.innerHTML = `
@@ -1440,40 +1437,26 @@
     }
 
     function renderHeatmap() {
-      const year = fAno.value === "Todos"
-        ? Math.max(...state.raw.map(r => r.ano))
-        : Number(fAno.value);
-
+      const year = fAno.value === "Todos" ? Math.max(...state.raw.map(r => r.ano)) : Number(fAno.value);
       const base = state.raw.filter(r => r.ano === year);
       const units = unique(base.map(r => r.unidade)).sort((a,b) => a.localeCompare(b, "pt-BR"));
 
-      const monthHeaders = MESES.map(m => `<th>${m.nome}</th>`).join("");
-      heatHeadRow.innerHTML = `
-        <th>Unidade</th>
-        ${monthHeaders}
-        <th>Méd.</th>
-        <th>Total</th>
-      `;
+      heatHeadRow.innerHTML = `<th>Unidade</th>${MESES.map(m => `<th>${m.nome}</th>`).join("")}<th>Méd.</th><th>Total</th>`;
 
       const matrix = units.map(unidade => {
         const rows = base.filter(r => r.unidade === unidade).sort((a,b) => a.mesNum - b.mesNum);
-
         const monthValues = MESES.map(m => {
           const items = rows.filter(r => r.mesNum === m.num);
           const s = summarize(items);
-
           switch (state.heatMetric) {
-            case "faltas": return s.faltas;
             case "media": return fVisao.value === "30d" ? s.mediaFaltasDia30 : s.mediaFaltasDia;
             case "taxa": return s.glosaPct;
             case "glosa": return s.glosa;
             default: return 0;
           }
         });
-
         const total = monthValues.reduce((a,b)=>a+b,0);
         const media = monthValues.length ? total / monthValues.length : 0;
-
         return { unidade, monthValues, media, total };
       });
 
@@ -1482,10 +1465,8 @@
       const max = Math.max(...allValues, 1);
 
       heatBody.innerHTML = "";
-
       matrix.forEach(row => {
         const tr = document.createElement("tr");
-
         const tdName = document.createElement("td");
         tdName.innerHTML = `<strong>${escapeHtml(row.unidade)}</strong>`;
         tr.appendChild(tdName);
@@ -1499,10 +1480,8 @@
 
         const tdMedia = document.createElement("td");
         tdMedia.textContent = formatHeatValue(row.media, state.heatMetric);
-
         const tdTotal = document.createElement("td");
         tdTotal.textContent = formatHeatValue(row.total, state.heatMetric);
-
         tr.appendChild(tdMedia);
         tr.appendChild(tdTotal);
         heatBody.appendChild(tr);
@@ -1520,7 +1499,6 @@
 
     function formatHeatValue(v, metric) {
       switch (metric) {
-        case "faltas": return num(v, 0);
         case "media": return num(v, 1);
         case "taxa": return pct(v, 1);
         case "glosa": return brl(v);
@@ -1528,28 +1506,26 @@
       }
     }
 
-    /******************************************************************
-     * 10) EVENTOS
-     ******************************************************************/
-    [fAno, fMes, fUnidade, fVisao].forEach(el => {
-      el.addEventListener("change", applyFilters);
-    });
+    function renderAll() {
+      updateViewLabels();
+      renderKPIs();
+      renderSummary();
+      renderNarrative();
+      renderComboChart();
+      renderRanking();
+      renderBarChart();
+      renderHeatmap();
+    }
+
+    [fAno, fModo, fMes, fUnidade, fVisao].forEach(el => el.addEventListener("change", applyFilters));
 
     btnLimpar.addEventListener("click", () => {
       fAno.value = "Todos";
+      fModo.value = "ytd";
       fMes.value = "Todos";
       fUnidade.value = "Todas";
       fVisao.value = "30d";
       applyFilters();
-    });
-
-    document.querySelectorAll("[data-hero]").forEach(btn => {
-      btn.addEventListener("click", () => {
-        document.querySelectorAll("[data-hero]").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        state.heroMetric = btn.dataset.hero;
-        renderHero();
-      });
     });
 
     document.querySelectorAll("[data-chart]").forEach(btn => {
@@ -1570,9 +1546,6 @@
       });
     });
 
-    /******************************************************************
-     * 11) INICIAR
-     ******************************************************************/
     loadData();
   </script>
 </body>
