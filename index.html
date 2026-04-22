@@ -44,44 +44,42 @@
     }
 
     .topbar{
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-start;
-  gap:18px;
-  margin-bottom:20px;
-  flex-wrap:wrap;
+      display:flex;
+      align-items:flex-start;
+      justify-content:flex-start;
+      gap:18px;
+      margin-bottom:20px;
+      flex-wrap:wrap;
     }
 
     .brand{
       display:flex;
-      align-items:center;
+      align-items:flex-start;
       justify-content:flex-start;
       gap:14px;
       min-width:auto;
       order:-1;
+      margin-right:8px;
     }
 
-.brand{
-  display:flex;
-  align-items:center;
-  justify-content:flex-start;
-  gap:14px;
-  min-width:auto;
-  margin-right:8px;
-}
+    #brandLogo{
+      max-height:46px;
+      width:auto;
+      object-fit:contain;
+      display:block;
+    }
 
-.brand-text{
-  text-align:left;
-  color:var(--muted);
-  font-size:12px;
-  line-height:1.4;
-}
+    .brand-text{
+      text-align:left;
+      color:var(--muted);
+      font-size:12px;
+      line-height:1.4;
+      padding-top:2px;
+    }
 
     .title-wrap{
-.title-wrap{
-  flex:1;
-  min-width:280px;
-}
+      flex:1;
+      min-width:280px;
     }
 
     .title-wrap h1{
@@ -485,10 +483,15 @@
       margin-top:10px;
       color:#9fd0ea;
       font-size:13px;
+      line-height:1.5;
     }
 
     .error{
       color:#ffc6c6;
+    }
+
+    .success{
+      color:#9dffd1;
     }
 
     .hidden{
@@ -526,7 +529,7 @@
         <h1>Painel Executivo · Contrato SME</h1>
         <h2>COMLURB · Limpeza Escolar</h2>
         <p>Leitura executiva com atualização automática a partir do Google Sheets publicado em CSV.</p>
-        <div id="statusMsg" class="status">Carregando base...</div>
+        <div id="statusMsg" class="status">Carregando base online...</div>
       </div>
     </header>
 
@@ -595,10 +598,10 @@
       </article>
 
       <article class="card" style="--accent:var(--red)">
-        <div class="card-label" id="kpiFaltaLabel">Impacto de faltas estimado</div>
+        <div class="card-label" id="kpiFaltaLabel">Média de faltas / dia</div>
         <div class="card-value" id="kpiFaltas">0</div>
-        <div class="chip red" id="kpiFaltasChip">postos-dia</div>
-        <div class="card-note" id="kpiFaltasNote">Na visão técnica, este card muda para Faltas Reais e Média/dia.</div>
+        <div class="chip red" id="kpiFaltasChip">faltas/dia</div>
+        <div class="card-note" id="kpiFaltasNote">Média diária de faltas no período filtrado.</div>
       </article>
     </section>
 
@@ -720,7 +723,11 @@
     /******************************************************************
      * 1) CONFIGURAÇÃO
      ******************************************************************/
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_pOHwnQ8u94Wd56llh_YaJko5gT2fM8A9YeMvd3XyRfgFec9Yjhe7jI-wVskFg2nC3RFVHyvWRJCa/pub?gid=1856807338&single=true&output=csv";
+    const CSV_URLS = [
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_pOHwnQ8u94Wd56llh_YaJko5gT2fM8A9YeMvd3XyRfgFec9Yjhe7jI-wVskFg2nC3RFVHyvWRJCa/pub?gid=1856807338&output=csv",
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vT_pOHwnQ8u94Wd56llh_YaJko5gT2fM8A9YeMvd3XyRfgFec9Yjhe7jI-wVskFg2nC3RFVHyvWRJCa/pub?gid=1856807338&single=true&output=csv"
+    ];
+
     const LOGO_URL = "./RIOPREFEITURA Comlurb horizontal monocromatica branca.png";
 
     /******************************************************************
@@ -860,17 +867,31 @@
         .replaceAll('"', "&quot;");
     }
 
+    function normalizeKey(k) {
+      return String(k || "")
+        .replace(/^\uFEFF/, "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim()
+        .toLowerCase()
+        .replace(/[\/\-]/g, "_")
+        .replace(/\s+/g, "_")
+        .replace(/__+/g, "_");
+    }
+
     function getField(row, names) {
-      const normalizedEntries = Object.entries(row).map(([k, v]) => [
-        String(k).replace(/^\uFEFF/, "").trim(),
-        v
-      ]);
+      const normalizedMap = {};
+      Object.keys(row || {}).forEach(key => {
+        normalizedMap[normalizeKey(key)] = row[key];
+      });
 
       for (const name of names) {
-        const found = normalizedEntries.find(([k]) => k === name);
-        if (found) return found[1];
+        const target = normalizeKey(name);
+        const value = normalizedMap[target];
+        if (value !== undefined && value !== null && String(value).trim() !== "") {
+          return value;
+        }
       }
-
       return "";
     }
 
@@ -887,35 +908,35 @@
      ******************************************************************/
     function normalizeRow(row) {
       const ano = Number(firstNonZero([
-        getField(row, ["Ano", "ANO", "ano"])
+        getField(row, ["Ano", "ano"])
       ]));
 
       const mesNum = Number(firstNonZero([
-        getField(row, ["Mês_Num", "Mes_Num", "MES_NUM", "mes_num", "Mês_num"])
+        getField(row, ["Mês_Num", "Mes_Num", "MesNum", "MêsNum", "mes_num", "mesnum"])
       ]));
 
       const mes = String(
-        getField(row, ["Mês", "Mes", "MES", "mes"]) || monthNameByNum(mesNum)
+        getField(row, ["Mês", "Mes", "mes"]) || monthNameByNum(mesNum)
       ).trim();
 
       const unidade = String(
-        getField(row, ["Unidade", "UNIDADE", "unidade", "CRE", "Unidade/CRE"])
+        getField(row, ["Unidade", "CRE", "Unidade/CRE", "unidade"])
       ).replace(/^\uFEFF/, "").trim() || "Sem unidade";
 
       const contratado = toNumber(getField(row, [
-        "Valor_Contratado", "VALOR_CONTRATADO", "Contratado", "Valor Contratado"
+        "Valor_Contratado", "Valor Contratado", "Contratado"
       ]));
 
       const bruto = toNumber(getField(row, [
-        "Faturamento_Bruto", "FATURAMENTO_BRUTO", "Bruto", "Faturamento Bruto"
+        "Faturamento_Bruto", "Faturamento Bruto", "Bruto"
       ]));
 
       const retroativo = toNumber(getField(row, [
-        "Retroativo", "RETROATIVO"
+        "Retroativo"
       ]));
 
       let fatOperacional = toNumber(getField(row, [
-        "Fat_Operacional", "FAT_OPERACIONAL", "Faturamento_Operacional", "Fat Operacional"
+        "Fat_Operacional", "Faturamento_Operacional", "Fat Operacional", "Faturamento Operacional"
       ]));
 
       if (!fatOperacional) {
@@ -923,7 +944,7 @@
       }
 
       let glosaOperacional = toNumber(getField(row, [
-        "Glosa_Operacional", "GLOSA_OPERACIONAL", "Glosa", "Glosa Operacional"
+        "Glosa_Operacional", "Glosa Operacional"
       ]));
 
       if (!glosaOperacional) {
@@ -931,36 +952,28 @@
       }
 
       const postos = toNumber(getField(row, [
-        "Postos", "POSTOS"
+        "Postos", "Posto", "Qtd_Postos", "Quantidade_Postos"
       ]));
 
       const diasMes = toNumber(getField(row, [
-        "Dias_Mês", "Dias_Mes", "DIAS_MES"
-      ]));
-
-      const valorPostoDiaContratual = toNumber(getField(row, [
-        "Valor_Posto_Dia_Contratual", "VALOR_POSTO_DIA_CONTRATUAL"
-      ]));
-
-      const valorDiaReal = toNumber(getField(row, [
-        "Valor_Dia_Real", "VALOR_DIA_REAL"
-      ]));
+        "Dias_Mês", "Dias_Mes", "Dias Mes", "dias_mes"
+      ])) || 30;
 
       const faltasReais = toNumber(getField(row, [
-        "Faltas_Reais", "FALTAS_REAIS", "Faltas", "Faltas Reais"
+        "Faltas_Reais", "Faltas Reais", "Faltas"
       ]));
 
       let glosaPct = toNumber(getField(row, [
-        "Glosa_%", "Glosa %", "Glosa%", "GLOSA_%"
+        "Glosa_%", "Glosa %", "Glosa%", "Perc_Glosa", "% Glosa"
       ]));
 
-      if (!glosaPct) {
-        glosaPct = safeDivide(glosaOperacional, contratado) * 100;
+      if (glosaPct && Math.abs(glosaPct) < 1) {
+        glosaPct = glosaPct * 100;
       }
 
-      const mesRealizado = String(getField(row, [
-        "Mês_Realizado", "Mes_Realizado", "MES_REALIZADO"
-      ])).trim();
+      if (!glosaPct && contratado) {
+        glosaPct = safeDivide(glosaOperacional, contratado) * 100;
+      }
 
       return {
         ano,
@@ -974,18 +987,57 @@
         glosaOperacional,
         postos,
         diasMes,
-        valorPostoDiaContratual,
-        valorDiaReal,
         faltasReais,
         glosaPct,
-        mesRealizado,
         _raw: row
       };
     }
 
     /******************************************************************
-     * 6) CARREGAR CSV
+     * 6) CARGA ONLINE DO CSV
      ******************************************************************/
+    function handleParsedData(results, sourceLabel) {
+      if (!results || !results.data || !results.data.length) {
+        throw new Error(`Sem dados em ${sourceLabel}`);
+      }
+
+      console.log("✅ Fonte carregada:", sourceLabel);
+      console.log("✅ Colunas do CSV:", Object.keys(results.data[0] || {}));
+      console.log("✅ Primeira linha bruta:", results.data[0]);
+
+      const rows = (results.data || [])
+        .map(normalizeRow)
+        .filter(r => r.ano && r.unidade && r.unidade !== "Sem unidade");
+
+      console.log("✅ Linhas normalizadas válidas:", rows.length);
+      if (rows[0]) {
+        console.log("✅ Primeira linha normalizada:", rows[0]);
+      }
+
+      if (!rows.length) {
+        throw new Error("A planilha foi lida, mas não retornou linhas válidas após a normalização.");
+      }
+
+      state.raw = rows;
+      buildFilters();
+      applyFilters();
+      statusMsg.innerHTML = `<span class="success">Base online carregada com ${rows.length} linhas.</span>`;
+    }
+
+    function parseCsvText(csvText, sourceLabel) {
+      const results = Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        transformHeader: function(header) {
+          return String(header)
+            .replace(/^\uFEFF/, "")
+            .trim();
+        }
+      });
+
+      handleParsedData(results, sourceLabel);
+    }
+
     async function loadData() {
       try {
         brandLogo.src = LOGO_URL || "";
@@ -993,45 +1045,83 @@
           brandLogo.classList.add("hidden");
         };
 
-        Papa.parse(CSV_URL, {
-          download: true,
-          header: true,
-          skipEmptyLines: true,
-          transformHeader: function(header) {
-            return String(header)
-              .replace(/^\uFEFF/, "")
-              .trim();
-          },
-          complete: function(results) {
-            console.log("CSV bruto:", results.data);
+        statusMsg.textContent = "Carregando base online...";
+        const errors = [];
 
-            const rows = (results.data || [])
-              .map(normalizeRow)
-              .filter(r => r.ano && r.unidade);
+        for (const url of CSV_URLS) {
+          try {
+            console.log("🔎 Tentando carregar CSV via fetch:", url);
 
-            console.log("Linhas normalizadas:", rows);
+            const response = await fetch(url, {
+              method: "GET",
+              cache: "no-store"
+            });
 
-            state.raw = rows;
-
-            if (!rows.length) {
-              throw new Error("A planilha foi lida, mas não retornou linhas válidas.");
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
             }
 
-            buildFilters();
-            applyFilters();
-            statusMsg.textContent = `Base carregada com ${rows.length} linhas.`;
-          },
-          error: function(err) {
-            showError(`Erro ao ler CSV: ${err.message || err}`);
+            const csvText = await response.text();
+
+            if (!csvText || !csvText.trim()) {
+              throw new Error("CSV vazio");
+            }
+
+            parseCsvText(csvText, `fetch: ${url}`);
+            return;
+          } catch (fetchErr) {
+            const detail = fetchErr && fetchErr.message ? fetchErr.message : String(fetchErr);
+            errors.push(`Fetch falhou em ${url}: ${detail}`);
+            console.warn("⚠️ Falha no fetch direto:", url, fetchErr);
+
+            try {
+              await new Promise((resolve, reject) => {
+                Papa.parse(url, {
+                  download: true,
+                  header: true,
+                  skipEmptyLines: true,
+                  downloadRequestHeaders: {
+                    "Cache-Control": "no-cache"
+                  },
+                  transformHeader: function(header) {
+                    return String(header)
+                      .replace(/^\uFEFF/, "")
+                      .trim();
+                  },
+                  complete: function(results) {
+                    try {
+                      handleParsedData(results, `papaparse: ${url}`);
+                      resolve();
+                    } catch (parseErr) {
+                      reject(parseErr);
+                    }
+                  },
+                  error: function(err) {
+                    reject(err || new Error("PapaParse download falhou"));
+                  }
+                });
+              });
+
+              return;
+            } catch (papaErr) {
+              const papaDetail = papaErr && papaErr.message ? papaErr.message : String(papaErr);
+              errors.push(`PapaParse falhou em ${url}: ${papaDetail}`);
+              console.warn("⚠️ Falha no PapaParse:", url, papaErr);
+            }
           }
-        });
+        }
+
+        showError(
+          "Não foi possível carregar o CSV online. Verifique se a planilha está publicada em CSV e se o link abre diretamente no navegador. Veja detalhes no console (F12)."
+        );
+        console.error("❌ Todas as tentativas falharam:", errors);
       } catch (err) {
         showError(err.message || String(err));
       }
     }
 
     function showError(message) {
-      statusMsg.innerHTML = `<span class="error">Erro: ${message}</span>`;
+      statusMsg.innerHTML = `<span class="error">${escapeHtml(message)}</span>`;
     }
 
     /******************************************************************
@@ -1074,35 +1164,44 @@
       const contratado = rows.reduce((s, r) => s + r.contratado, 0);
       const fatOperacional = rows.reduce((s, r) => s + r.fatOperacional, 0);
       const glosa = rows.reduce((s, r) => s + r.glosaOperacional, 0);
-      const postos = rows.reduce((s, r) => s + r.postos, 0);
-      const dias = rows.reduce((s, r) => s + r.diasMes, 0);
       const faltas = rows.reduce((s, r) => s + r.faltasReais, 0);
+
+      const exposureReal = rows.reduce((s, r) => s + (r.postos * (r.diasMes || 30)), 0);
+      const exposure30 = rows.reduce((s, r) => s + (r.postos * 30), 0);
+
+      const mesesDistintos = new Set(rows.map(r => `${r.ano}-${r.mesNum}`)).size || 1;
+
+      const diasReaisDistintos = (() => {
+        const seen = new Map();
+        rows.forEach(r => {
+          const key = `${r.ano}-${r.mesNum}`;
+          if (!seen.has(key)) seen.set(key, r.diasMes || 30);
+        });
+        return [...seen.values()].reduce((a, b) => a + b, 0) || 1;
+      })();
 
       const execucaoPct = safeDivide(fatOperacional, contratado) * 100;
       const glosaPct = safeDivide(glosa, contratado) * 100;
 
-      const valorDia30 = safeDivide(fatOperacional, postos * 30);
-      const valorDiaReal = firstNonZero([
-        safeDivide(rows.reduce((s, r) => s + (r.valorDiaReal || 0), 0), rows.filter(r => r.valorDiaReal > 0).length),
-        safeDivide(fatOperacional, postos * Math.max(dias, 1))
-      ]);
+      const valorDia30 = safeDivide(fatOperacional, exposure30);
+      const valorDiaReal = safeDivide(fatOperacional, exposureReal);
 
-      const mediaFaltasDia = safeDivide(faltas, Math.max(dias, 1));
-      const impactoEstimado = valorDiaReal ? glosa / valorDiaReal : 0;
+      const mediaFaltasDia30 = safeDivide(faltas, mesesDistintos * 30);
+      const mediaFaltasDia = safeDivide(faltas, diasReaisDistintos);
 
       return {
         contratado,
         fatOperacional,
         glosa,
-        postos,
-        dias,
         faltas,
+        exposureReal,
+        exposure30,
         execucaoPct,
         glosaPct,
         valorDia30,
         valorDiaReal,
         mediaFaltasDia,
-        impactoEstimado
+        mediaFaltasDia30
       };
     }
 
@@ -1117,10 +1216,7 @@
 
       return [...map.entries()].map(([unidade, items]) => {
         const s = summarize(items);
-        return {
-          unidade,
-          ...s
-        };
+        return { unidade, ...s };
       });
     }
 
@@ -1159,17 +1255,15 @@
       if (is30d) {
         kpiDiaLabel.textContent = "Valor dia";
         kpiDiaChip.textContent = "base 30 dias";
-        kpiDiaNote.textContent = "Na visão executiva, usa a referência do valor-dia em base 30.";
-        kpiFaltaLabel.textContent = "Impacto de faltas estimado";
-        kpiFaltasChip.textContent = "postos-dia";
-        kpiFaltasNote.textContent = "Estimado pela relação entre glosa e valor-dia real.";
+        kpiDiaNote.textContent = "Na visão executiva, usa a referência do valor-dia em base 30 (divisor fixo contratual).";
+        kpiFaltaLabel.textContent = "Média de faltas / dia";
+        kpiFaltasNote.textContent = "Média diária de faltas no período — base executiva (30 dias/mês).";
       } else {
         kpiDiaLabel.textContent = "Valor dia real";
-        kpiDiaChip.textContent = "valor real";
-        kpiDiaNote.textContent = "Na visão técnica, usa o valor-dia real do período.";
-        kpiFaltaLabel.textContent = "Faltas reais";
-        kpiFaltasChip.textContent = "média / dia";
-        kpiFaltasNote.textContent = "Na visão técnica, o card passa a mostrar o valor real.";
+        kpiDiaChip.textContent = "dias reais";
+        kpiDiaNote.textContent = "Na visão técnica, usa os dias reais do mês no denominador.";
+        kpiFaltaLabel.textContent = "Média de faltas / dia";
+        kpiFaltasNote.textContent = "Média diária de faltas no período — base técnica com dias reais do mês.";
       }
     }
 
@@ -1190,8 +1284,8 @@
       kpiExecucaoChip.textContent = "contratado x realizado";
 
       kpiDia.textContent = brl(is30d ? s.valorDia30 : s.valorDiaReal);
-      kpiFaltas.textContent = is30d ? num(s.impactoEstimado, 0) : num(s.faltas, 0);
-      kpiFaltasChip.textContent = is30d ? "postos-dia" : `média / dia: ${num(s.mediaFaltasDia, 1)}`;
+      kpiFaltasChip.textContent = is30d ? "base 30 dias" : "dias reais";
+      kpiFaltas.textContent = num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1);
     }
 
     function renderHero() {
@@ -1216,20 +1310,20 @@
           sub: "Essa leitura ajuda a identificar rapidamente onde o contrato está mais pressionado."
         },
         faltas: {
-          k: is30d ? "Impacto de faltas estimado" : "Faltas reais",
-          v: is30d ? num(s.impactoEstimado, 0) : num(s.faltas, 0),
-          chip: is30d ? "postos-dia" : `média / dia: ${num(s.mediaFaltasDia, 1)}`,
+          k: "Média de faltas / dia",
+          v: num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1),
+          chip: is30d ? "base 30 dias" : "dias reais",
           foot: is30d
-            ? "Estimativa derivada da glosa e do valor-dia real."
-            : "Quantidade real apurada no período filtrado.",
+            ? "Média diária de faltas no período — base executiva (mês = 30 dias)."
+            : "Média diária de faltas com os dias reais do período.",
           sub: is30d
-            ? "Na visão executiva, a lógica é mais sintética."
-            : "Na visão técnica, a descrição acompanha a base real."
+            ? "Na visão executiva, cada mês conta como 30 dias no denominador."
+            : "Na visão técnica, o denominador usa os dias reais de cada mês."
         },
         media: {
-          k: "Média / dia",
-          v: num(s.mediaFaltasDia, 1),
-          chip: is30d ? "base executiva" : "base real",
+          k: "Média de faltas / dia",
+          v: num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1),
+          chip: is30d ? "base executiva · 30 dias" : "base real",
           foot: "Média de faltas por dia dentro do período filtrado.",
           sub: "Entrou para facilitar a leitura da seleção e apoiar a análise por unidade."
         }
@@ -1245,13 +1339,14 @@
 
     function renderSummary() {
       const s = summarize(state.filtered);
+      const is30d = fVisao.value === "30d";
       const ano = fAno.value === "Todos" ? "Todos os anos" : fAno.value;
       const mes = fMes.value === "Todos" ? "Todos os meses" : monthNameByNum(fMes.value);
       const unidade = fUnidade.value === "Todas" ? "Todas as unidades" : fUnidade.value;
 
       miniPeriodo.textContent = `${mes} · ${ano}`;
       miniGlosa.textContent = brl(s.glosa);
-      miniMediaFaltas.textContent = num(s.mediaFaltasDia, 1);
+      miniMediaFaltas.textContent = num(is30d ? s.mediaFaltasDia30 : s.mediaFaltasDia, 1);
 
       if (fUnidade.value !== "Todas") {
         miniPeriodo.textContent = `${mes} · ${ano} · ${unidade}`;
@@ -1270,6 +1365,8 @@
       }
 
       rows.forEach(r => {
+        const is30d = fVisao.value === "30d";
+        const media = is30d ? r.mediaFaltasDia30 : r.mediaFaltasDia;
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td><strong>${escapeHtml(r.unidade)}</strong></td>
@@ -1277,7 +1374,7 @@
           <td>${brl(r.fatOperacional)}</td>
           <td>${brl(r.glosa)}</td>
           <td>${pct(r.glosaPct)}</td>
-          <td>${num(r.mediaFaltasDia, 1)}</td>
+          <td>${num(media, 1)}</td>
         `;
         rankingBody.appendChild(tr);
       });
@@ -1314,7 +1411,7 @@
         media: {
           title: "Evolução mensal · média de faltas / dia",
           foot: `Ano ${year} · média diária por mês`,
-          getter: r => r.mediaFaltasDia,
+          getter: r => fVisao.value === "30d" ? r.mediaFaltasDia30 : r.mediaFaltasDia,
           formatter: v => num(v, 1)
         }
       };
@@ -1367,7 +1464,7 @@
 
           switch (state.heatMetric) {
             case "faltas": return s.faltas;
-            case "media": return s.mediaFaltasDia;
+            case "media": return fVisao.value === "30d" ? s.mediaFaltasDia30 : s.mediaFaltasDia;
             case "taxa": return s.glosaPct;
             case "glosa": return s.glosa;
             default: return 0;
