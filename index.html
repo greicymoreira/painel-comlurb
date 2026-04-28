@@ -3,98 +3,909 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Painel Executivo e Analítico SME · COMLURB</title>
+<title>Painel SME COMLURB</title>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+
 <style>
-:root{--bg:#071a2d;--bg2:#0a2138;--card:#0d2842;--card2:#112f4c;--line:#214e7a;--text:#edf4fb;--muted:#9fb6cc;--blue:#31a7ff;--cyan:#63d4ff;--orange:#ff8a2a;--orange2:#ffb14a;--red:#ff5e5e;--green:#32d583;--yellow:#f6c54f;--radius:18px;--shadow:0 18px 40px rgba(0,0,0,.28)}
+:root{
+  --bg:#071827;
+  --bg2:#0b2238;
+  --card:#102b45;
+  --card2:#143653;
+  --line:rgba(137,196,244,.18);
+  --text:#f3f8fc;
+  --muted:#9fb4c8;
+  --blue:#2ea8ff;
+  --orange:#ff9f43;
+  --red:#ff5c5c;
+  --green:#32d583;
+  --yellow:#ffd166;
+  --shadow:0 18px 45px rgba(0,0,0,.28);
+  --radius:20px;
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--text);background:radial-gradient(circle at top right,rgba(49,167,255,.11),transparent 28%),radial-gradient(circle at top left,rgba(255,138,42,.08),transparent 20%),linear-gradient(180deg,#061320 0%,#081b30 100%);min-height:100vh}
-.wrap{max-width:1520px;margin:0 auto;padding:18px 22px 34px}
-.topbar{display:flex;justify-content:space-between;gap:18px;align-items:center;padding-bottom:14px;border-bottom:1px solid rgba(99,212,255,.18)}
-.brand{display:flex;align-items:center;gap:16px}.logo{width:118px;height:62px;display:grid;place-items:center;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(99,212,255,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.02);font-weight:900;letter-spacing:1px;overflow:hidden;padding:7px;color:var(--cyan)}
-.logo img{max-width:100%;max-height:100%;object-fit:contain}.title h1{margin:0;font-size:34px;line-height:1}.title p{margin:6px 0 0;color:var(--muted);letter-spacing:2px;text-transform:uppercase;font-size:12px}.chips{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.chip{padding:10px 14px;border-radius:999px;background:rgba(12,36,61,.9);border:1px solid rgba(99,212,255,.14);color:#dce8f4;font-size:13px}.chip.alert{border-color:rgba(255,138,42,.45);color:#ffd2a5}.chip.update{font-size:11px;color:var(--muted)}
-.ticker{margin-top:14px;overflow:hidden;border-radius:16px;background:linear-gradient(90deg,rgba(10,31,51,.95),rgba(14,39,64,.95));border:1px solid rgba(99,212,255,.12);box-shadow:var(--shadow);position:relative}.ticker:before{content:"DESTAQUES";position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--cyan);font-weight:700;font-size:12px;letter-spacing:1.6px;z-index:2;background:rgba(7,26,45,.92);padding-right:14px}.ticker-track{display:flex;width:max-content;animation:ticker 30s linear infinite;padding:13px 0 13px 110px}.ticker-item{padding:0 24px;color:#d6e4f3;font-size:14px;white-space:nowrap;border-right:1px solid rgba(99,212,255,.12)}.tag{display:inline-block;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:700;margin-right:10px;letter-spacing:.8px;text-transform:uppercase}.tag.ok{background:rgba(50,213,131,.14);color:#91f0bf}.tag.att{background:rgba(255,177,74,.14);color:#ffd08c}.tag.crit{background:rgba(255,94,94,.14);color:#ffb0b0}@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-.controls{margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr auto;gap:12px;background:rgba(10,31,51,.72);border:1px solid rgba(99,212,255,.12);border-radius:18px;padding:14px}.filter{background:rgba(11,36,60,.9);border:1px solid rgba(99,212,255,.10);border-radius:14px;padding:10px 12px}.filter label{display:block;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:6px}.filter select,.filter input{width:100%;background:transparent;border:none;color:#eef5fb;font-size:15px;font-weight:600;outline:none}.filter select option{color:#111}.btn{border:none;border-radius:14px;background:linear-gradient(135deg,rgba(255,138,42,.92),rgba(255,177,74,.92));color:#1b1308;padding:12px 16px;font-weight:900;cursor:pointer;box-shadow:var(--shadow)}.btn.secondary{background:rgba(255,255,255,.06);color:#dce8f4;border:1px solid rgba(99,212,255,.16)}
-.tabs{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}.tab{padding:10px 14px;border-radius:999px;border:1px solid rgba(99,212,255,.16);background:rgba(255,255,255,.04);color:#dce8f4;font-weight:800;cursor:pointer}.tab.active{background:rgba(49,167,255,.16);border-color:rgba(99,212,255,.4);color:#fff}.grid-cards{margin-top:18px;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px}.card{background:linear-gradient(180deg,rgba(11,35,58,.97),rgba(9,28,47,.97));border:1px solid rgba(99,212,255,.12);border-radius:20px;padding:18px 18px 16px;box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:145px}.card:after{content:"";position:absolute;left:0;top:0;right:0;height:3px;background:linear-gradient(90deg,var(--blue),var(--cyan));opacity:.95}.card.orange:after{background:linear-gradient(90deg,var(--orange),var(--orange2))}.card.red:after{background:linear-gradient(90deg,#ff7043,#ff4d4f)}.card.green:after{background:linear-gradient(90deg,#32d583,#7cf2b6)}.card.yellow:after{background:linear-gradient(90deg,var(--yellow),#ffe08d)}.card label{display:block;color:var(--muted);text-transform:uppercase;letter-spacing:2px;font-size:11px;margin-bottom:10px}.value-main{font-size:28px;font-weight:800;line-height:1.05;margin:0 0 10px}.sub{color:var(--muted);font-size:12px;line-height:1.45}.pill{display:inline-block;padding:5px 10px;border-radius:999px;font-size:12px;font-weight:700;margin-bottom:8px}.pill.green{background:rgba(50,213,131,.14);color:#98efc2}.pill.orange{background:rgba(255,177,74,.14);color:#ffd79e}.pill.red{background:rgba(255,94,94,.14);color:#ffb6b6}.alert-band{margin-top:16px;background:linear-gradient(90deg,rgba(56,39,18,.62),rgba(44,34,25,.45));border:1px solid rgba(255,138,42,.45);border-radius:18px;padding:16px 18px;display:flex;gap:14px;align-items:flex-start;box-shadow:var(--shadow)}.alert-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:rgba(255,138,42,.16);color:#ffd8b0;font-weight:900;flex:0 0 auto}.alert-band h3{margin:0 0 6px;color:#ffb96a;text-transform:uppercase;letter-spacing:1.2px;font-size:13px}.alert-band p{margin:0;color:#e8f0f8;font-size:14px;line-height:1.5}.grid-main{margin-top:18px;display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:16px}.grid-bottom{margin-top:16px;display:grid;grid-template-columns:1.25fr 1fr;gap:16px}.panel{background:linear-gradient(180deg,rgba(11,35,58,.95),rgba(9,28,47,.95));border:1px solid rgba(99,212,255,.12);border-radius:20px;padding:16px;box-shadow:var(--shadow)}.panel h2{margin:0 0 14px;font-size:15px;text-transform:uppercase;letter-spacing:1.8px;color:#d9e8f6}.panel .panel-head{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:14px}.panel .panel-head h2{margin:0}.tiny{color:var(--muted);font-size:12px}table{width:100%;border-collapse:collapse}th,td{padding:10px 8px;text-align:left;border-bottom:1px solid rgba(99,212,255,.10);font-size:13px}th{color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;font-size:11px}td strong{color:#fff}.bar{width:100%;height:8px;background:rgba(255,255,255,.06);border-radius:999px;overflow:hidden}.bar>span{display:block;height:100%;background:linear-gradient(90deg,var(--orange),var(--orange2));border-radius:999px}.trend{display:flex;align-items:flex-end;gap:10px;height:235px;padding-top:8px;overflow-x:auto}.col{flex:1;display:flex;flex-direction:column;align-items:center;gap:8px;min-width:42px}.col .stick{width:100%;max-width:42px;border-radius:12px 12px 0 0;background:linear-gradient(180deg,rgba(49,167,255,.95),rgba(15,83,144,.95));border:1px solid rgba(99,212,255,.12)}.col.orange .stick{background:linear-gradient(180deg,rgba(255,138,42,.96),rgba(182,91,16,.96));border-color:rgba(255,177,74,.18)}.col.red .stick{background:linear-gradient(180deg,rgba(255,94,94,.95),rgba(150,36,36,.95));border-color:rgba(255,94,94,.18)}.col small{color:var(--muted);white-space:nowrap}.col .labelValue{font-size:11px;color:#cfe0ef;text-align:center;min-height:28px}.section{display:none}.section.active{display:block}.heatmap-wrap{overflow:auto;max-height:520px;border-radius:14px}.heatmap{border-collapse:separate;border-spacing:6px;width:100%;min-width:980px}.heatmap th,.heatmap td{border:none;padding:10px 8px;text-align:center;border-radius:10px;font-size:12px}.heatmap th:first-child,.heatmap td:first-child{text-align:left;position:sticky;left:0;background:#0d2842;z-index:2}.footnote{margin-top:14px;color:var(--muted);font-size:12px;text-align:right}.note{margin-top:12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(99,212,255,.10);color:#dce8f4;font-size:13px;line-height:1.45}.loading{margin-top:16px;padding:14px;border-radius:16px;background:rgba(99,212,255,.08);border:1px solid rgba(99,212,255,.18);color:#dce8f4}.error{margin-top:16px;padding:14px;border-radius:16px;background:rgba(255,94,94,.12);border:1px solid rgba(255,94,94,.25);color:#ffb6b6;display:none}
-@media(max-width:1280px){.grid-cards{grid-template-columns:repeat(3,minmax(0,1fr))}.grid-main,.grid-bottom{grid-template-columns:1fr}.controls{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:760px){.topbar{flex-direction:column;align-items:flex-start}.grid-cards{grid-template-columns:1fr}.controls{grid-template-columns:1fr}.title h1{font-size:28px}}
+body{
+  margin:0;
+  font-family:Segoe UI,Arial,sans-serif;
+  color:var(--text);
+  background:
+    radial-gradient(circle at 10% 0%,rgba(46,168,255,.16),transparent 26%),
+    radial-gradient(circle at 90% 0%,rgba(255,159,67,.13),transparent 28%),
+    linear-gradient(180deg,#061421,#081b2d);
+}
+.wrap{max-width:1500px;margin:0 auto;padding:22px}
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:20px;
+  padding:18px 0 20px;
+  border-bottom:1px solid var(--line);
+}
+.brand{display:flex;align-items:center;gap:18px}
+.logo{
+  width:150px;
+  min-width:150px;
+  height:70px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.logo img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+}
+.logo-fallback{
+  font-size:22px;
+  font-weight:900;
+  letter-spacing:1px;
+  color:white;
+}
+h1{margin:0;font-size:34px;line-height:1.05}
+.subtitle{margin:7px 0 0;color:var(--muted);font-size:13px;text-transform:uppercase;letter-spacing:1.8px}
+.badges{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.badge{
+  padding:10px 14px;
+  border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line);
+  font-size:13px;
+  color:#dcecf8;
+}
+.badge strong{color:white}
+
+.controls{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(5,1fr) auto;
+  gap:12px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  background:rgba(9,29,48,.78);
+  box-shadow:var(--shadow);
+}
+.filter{
+  padding:10px 12px;
+  border-radius:15px;
+  border:1px solid var(--line);
+  background:rgba(255,255,255,.04);
+}
+.filter label{
+  display:block;
+  margin-bottom:6px;
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+select{
+  width:100%;
+  background:transparent;
+  border:0;
+  outline:0;
+  color:white;
+  font-size:15px;
+  font-weight:700;
+}
+select option{color:#111}
+button{
+  border:0;
+  border-radius:15px;
+  padding:12px 18px;
+  font-weight:900;
+  cursor:pointer;
+  color:#231404;
+  background:linear-gradient(135deg,#ff9f43,#ffc36b);
+}
+button.secondary{
+  color:white;
+  background:rgba(255,255,255,.06);
+  border:1px solid var(--line);
+}
+.tabs{margin-top:14px;display:flex;gap:10px;flex-wrap:wrap}
+.tab{
+  color:white;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line);
+  border-radius:999px;
+  padding:10px 16px;
+}
+.tab.active{background:rgba(46,168,255,.22);border-color:rgba(46,168,255,.6)}
+
+.statusbar{
+  display:none;
+  margin-top:16px;
+  padding:14px 16px;
+  border-radius:16px;
+  border:1px solid var(--line);
+  background:rgba(46,168,255,.09);
+  color:#dcecf8;
+}
+.statusbar.error{
+  display:block;
+  border-color:rgba(255,92,92,.35);
+  background:rgba(255,92,92,.12);
+  color:#ffc4c4;
+}
+
+.section{display:none}
+.section.active{display:block}
+
+.cards{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(6,1fr);
+  gap:14px;
+}
+.card{
+  min-height:142px;
+  padding:18px;
+  border-radius:var(--radius);
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(16,43,69,.96),rgba(10,30,49,.96));
+  box-shadow:var(--shadow);
+  position:relative;
+  overflow:hidden;
+}
+.card:before{
+  content:"";
+  position:absolute;
+  left:0;right:0;top:0;height:4px;
+  background:linear-gradient(90deg,var(--blue),#7dd3fc);
+}
+.card.orange:before{background:linear-gradient(90deg,var(--orange),#ffd166)}
+.card.red:before{background:linear-gradient(90deg,var(--red),#ff9c9c)}
+.card.green:before{background:linear-gradient(90deg,var(--green),#98f5c5)}
+.card label{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  letter-spacing:1.8px;
+  text-transform:uppercase;
+  margin-bottom:12px;
+}
+.value{
+  font-size:28px;
+  font-weight:900;
+  line-height:1.05;
+  margin-bottom:8px;
+}
+.small{color:var(--muted);font-size:12px;line-height:1.45}
+
+.reading{
+  margin-top:16px;
+  display:flex;
+  gap:14px;
+  padding:16px 18px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,159,67,.35);
+  background:linear-gradient(90deg,rgba(255,159,67,.14),rgba(255,255,255,.03));
+  box-shadow:var(--shadow);
+}
+.icon{
+  width:38px;height:38px;min-width:38px;
+  border-radius:12px;
+  display:grid;place-items:center;
+  background:rgba(255,159,67,.18);
+  color:#ffd8a8;
+  font-weight:900;
+}
+.reading h3{margin:0 0 6px;color:#ffc36b;font-size:13px;text-transform:uppercase;letter-spacing:1.4px}
+.reading p{margin:0;color:#eef6fd;font-size:14px;line-height:1.5}
+
+.grid{
+  margin-top:16px;
+  display:grid;
+  grid-template-columns:1.1fr 1fr 1fr;
+  gap:16px;
+}
+.grid.two{grid-template-columns:1.2fr 1fr}
+.panel{
+  padding:16px;
+  border-radius:var(--radius);
+  border:1px solid var(--line);
+  background:linear-gradient(180deg,rgba(16,43,69,.94),rgba(10,30,49,.94));
+  box-shadow:var(--shadow);
+}
+.panel h2{
+  margin:0 0 14px;
+  color:#e8f3fb;
+  font-size:15px;
+  text-transform:uppercase;
+  letter-spacing:1.7px;
+}
+table{width:100%;border-collapse:collapse}
+th,td{
+  padding:10px 8px;
+  border-bottom:1px solid var(--line);
+  text-align:left;
+  font-size:13px;
+}
+th{
+  color:var(--muted);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:1.2px;
+}
+td strong{color:white}
+.pill{
+  display:inline-block;
+  padding:5px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:800;
+}
+.pill.green{color:#9af3c6;background:rgba(50,213,131,.14)}
+.pill.orange{color:#ffd19b;background:rgba(255,159,67,.16)}
+.pill.red{color:#ffc1c1;background:rgba(255,92,92,.16)}
+.bar{
+  height:8px;
+  border-radius:999px;
+  background:rgba(255,255,255,.07);
+  overflow:hidden;
+}
+.bar span{
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--orange),#ffd166);
+}
+.chart{
+  height:260px;
+  display:flex;
+  align-items:flex-end;
+  gap:10px;
+  overflow-x:auto;
+  padding-top:10px;
+}
+.col{
+  min-width:48px;
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:7px;
+}
+.col .lab{
+  min-height:30px;
+  font-size:11px;
+  color:#d7e8f6;
+  text-align:center;
+}
+.col .stick{
+  width:100%;
+  max-width:44px;
+  border-radius:12px 12px 0 0;
+  background:linear-gradient(180deg,#2ea8ff,#17649d);
+  border:1px solid rgba(255,255,255,.08);
+}
+.col.orange .stick{background:linear-gradient(180deg,#ff9f43,#b85f13)}
+.col.red .stick{background:linear-gradient(180deg,#ff5c5c,#9b2d2d)}
+.col small{color:var(--muted);font-size:11px}
+.note{
+  padding:13px;
+  border-radius:15px;
+  background:rgba(255,255,255,.045);
+  border:1px solid var(--line);
+  color:#dcecf8;
+  font-size:13px;
+  line-height:1.55;
+}
+.heatwrap{overflow:auto;max-height:540px}
+.heatmap{border-collapse:separate;border-spacing:6px;min-width:900px}
+.heatmap th,.heatmap td{border:0;border-radius:10px;text-align:center}
+.heatmap th:first-child,.heatmap td:first-child{
+  position:sticky;
+  left:0;
+  text-align:left;
+  background:#102b45;
+  z-index:2;
+}
+.footer{
+  margin-top:18px;
+  color:var(--muted);
+  font-size:12px;
+  text-align:right;
+}
+@media(max-width:1250px){
+  .cards{grid-template-columns:repeat(3,1fr)}
+  .grid,.grid.two{grid-template-columns:1fr}
+  .controls{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .header{flex-direction:column;align-items:flex-start}
+  .controls,.cards{grid-template-columns:1fr}
+  h1{font-size:27px}
+}
 </style>
 </head>
+
 <body>
 <div class="wrap">
-  <div class="topbar">
+
+  <header class="header">
     <div class="brand">
-      <div class="logo" id="logoBox"><img src="RIOPREFEITURA Comlurb horizontal monocromatica branco.png" alt="COMLURB" onerror="this.style.display='none';document.getElementById('logoBox').textContent='COMLURB'" /></div>
-      <div class="title"><h1 id="tituloPrincipal">Painel Executivo SME · Limpeza</h1><p id="subtituloPrincipal">Visão executiva e analítica · Dados dinâmicos Google Sheets</p></div>
+      <div class="logo" id="logoBox">
+        <img src="RIOPREFEITURA Comlurb horizontal monocromatica branco.png"
+             alt="COMLURB"
+             onerror="document.getElementById('logoBox').innerHTML='<div class=&quot;logo-fallback&quot;>COMLURB</div>'">
+      </div>
+      <div>
+        <h1>Painel Executivo SME · COMLURB</h1>
+        <div class="subtitle">Faturamento · Glosa · Faltas · Análise operacional</div>
+      </div>
     </div>
-    <div class="chips"><div class="chip">Ano: <strong id="chipAno"></strong></div><div class="chip">Mês: <strong id="chipMes"></strong></div><div class="chip alert">Tolerância: <strong id="chipMeta"></strong></div><div class="chip update">Atualizado: <strong id="chipAtualizacao">—</strong></div></div>
-  </div>
-  <div class="ticker"><div class="ticker-track" id="tickerTrack"><div class="ticker-item">Carregando dados…</div></div></div>
-  <div id="loading" class="loading">Carregando dados publicados do Google Sheets...</div>
-  <div id="erro" class="error"></div>
-  <div class="controls"><div class="filter"><label>Ano</label><select id="fAno" onchange="onAnoChange()"></select></div><div class="filter"><label>Mês</label><select id="fMes" onchange="aplicarFiltros()"></select></div><div class="filter"><label>Unidade</label><select id="fUnidade" onchange="aplicarFiltros()"></select></div><div class="filter"><label>Tipo de visão</label><select id="fVisao" onchange="aplicarFiltros()"><option value="corrigida">Executiva corrigida</option><option value="original">Técnica original</option></select></div><div class="filter"><label>Indicador do gráfico</label><select id="fGrafico" onchange="aplicarFiltros()"><option value="glosaPct">% Glosa</option><option value="fat">Faturamento</option><option value="glosa">Glosa</option><option value="faltasMedia">Média faltas</option></select></div><button class="btn" onclick="aplicarFiltros()">Atualizar</button></div>
-  <div class="tabs"><button class="tab active" onclick="trocarSecao('executiva',this)">Parte executiva</button><button class="tab" onclick="trocarSecao('analitica',this)">Parte analítica</button><button class="tab" onclick="trocarSecao('governanca',this)">Governança</button></div>
+    <div class="badges">
+      <div class="badge">Ano: <strong id="bAno">—</strong></div>
+      <div class="badge">Mês: <strong id="bMes">—</strong></div>
+      <div class="badge">Tolerância: <strong id="bTol">3,0%</strong></div>
+      <div class="badge">Registros: <strong id="bRegs">—</strong></div>
+    </div>
+  </header>
 
-  <section id="executiva" class="section active">
-    <div class="grid-cards"><section class="card green"><label>Faturamento operacional</label><div class="value-main" id="fatMes"></div><div class="sub" id="subFat">Mês atual · base selecionada</div></section><section class="card orange"><label>Glosa corrigida</label><div class="value-main" id="glosaMes"></div><div class="sub">Equivalente a <strong id="glosaPctCard"></strong> do faturamento operacional</div></section><section class="card"><label>Variação mensal</label><div class="value-main" id="mom"></div><div class="sub">Comparativo contra mês anterior</div></section><section class="card"><label>Valor dia contratual</label><div class="value-main" id="valorDia"></div><div class="sub">Conforme contrato / parâmetro vigente</div></section><section class="card"><label>Faturamento YTD</label><div class="value-main" id="fatYtd"></div><div class="sub">Acumulado no ano até o mês</div></section><section class="card red"><label>Glosa YTD</label><div class="value-main" id="glosaYtd"></div><div class="sub">Percentual YTD: <strong id="glosaYtdPct"></strong></div></section></div>
-    <div class="alert-band"><div class="alert-icon">!</div><div><h3>Leitura executiva</h3><p id="narrativa"></p></div></div>
-    <div class="grid-main"><section class="panel"><h2>Top 3 unidades · maior glosa</h2><table><thead><tr><th>#</th><th>Unidade</th><th>Glosa</th><th>Participação</th></tr></thead><tbody id="topBody"></tbody></table></section><section class="panel"><h2>Comparativos principais</h2><table><tbody><tr><th>Faturamento mês anterior</th><td id="fatAnterior"></td></tr><tr><th>Faturamento mesmo mês ano anterior</th><td id="fatAnoAnterior"></td></tr><tr><th>Glosa % mês atual</th><td id="glosaAtualTabela"></td></tr><tr><th>Status tolerância</th><td><span class="pill" id="statusPill"></span></td></tr><tr><th>Média de faltas</th><td id="faltasMediaTabela"></td></tr></tbody></table></section><section class="panel"><h2>Resumo para reunião</h2><div class="note" id="resumoReuniao"></div></section></div>
-    <div class="grid-bottom"><section class="panel"><h2>Evolução mensal</h2><div class="trend" id="trendChart"></div><div class="footnote" id="graficoNota">Meses exibidos apenas quando há dados lançados.</div></section><section class="panel"><h2>Radar de decisão</h2><table><tbody id="radarBody"></tbody></table></section></div>
+  <div id="status" class="statusbar">Carregando dados...</div>
+
+  <section class="controls">
+    <div class="filter">
+      <label>Ano</label>
+      <select id="fAno"></select>
+    </div>
+    <div class="filter">
+      <label>Mês</label>
+      <select id="fMes"></select>
+    </div>
+    <div class="filter">
+      <label>Unidade</label>
+      <select id="fUnidade"></select>
+    </div>
+    <div class="filter">
+      <label>Visão</label>
+      <select id="fVisao">
+        <option value="corrigida">Executiva corrigida</option>
+        <option value="original">Técnica original</option>
+      </select>
+    </div>
+    <div class="filter">
+      <label>Gráfico</label>
+      <select id="fIndicador">
+        <option value="glosaPct">% Glosa</option>
+        <option value="glosa">Glosa R$</option>
+        <option value="fat">Faturamento</option>
+        <option value="faltasMedia">Média de faltas</option>
+      </select>
+    </div>
+    <button onclick="aplicar()">Atualizar</button>
   </section>
 
-  <section id="analitica" class="section">
-    <div class="grid-main"><section class="panel"><div class="panel-head"><h2>Tabela analítica por unidade</h2><span class="tiny" id="qtdLinhas"></span></div><table><thead><tr><th>Unidade</th><th>Contratado</th><th>Fat.</th><th>Glosa</th><th>%</th><th>Média faltas</th></tr></thead><tbody id="analiticaBody"></tbody></table></section><section class="panel"><h2>Distribuição da glosa</h2><div class="trend" id="distChart"></div></section><section class="panel"><h2>Interpretação analítica</h2><div class="note" id="interpretacaoAnalitica"></div></section></div>
-    <div class="panel" style="margin-top:16px"><h2>Mapa de calor mensal por unidade</h2><div class="heatmap-wrap"><table class="heatmap" id="heatmapTable"></table></div></div>
-  </section>
+  <nav class="tabs">
+    <button class="tab active" onclick="secao('exec', this)">Parte executiva</button>
+    <button class="tab" onclick="secao('ana', this)">Parte analítica</button>
+    <button class="tab" onclick="secao('gov', this)">Governança</button>
+  </nav>
 
-  <section id="governanca" class="section"><div class="grid-main"><section class="panel"><h2>Parâmetros do painel</h2><table><tbody id="paramBody"></tbody></table></section><section class="panel"><h2>Validação mínima</h2><table><tbody id="validacaoBody"></tbody></table></section><section class="panel"><h2>Notas metodológicas</h2><div class="note"><strong>Visão executiva:</strong> usa campos corrigidos quando disponíveis. <br><strong>Visão técnica:</strong> usa campos originais. <br><strong>% Glosa:</strong> glosa ÷ faturamento operacional. <br><strong>Média de faltas:</strong> média das faltas por linha/unidade no período filtrado. <br><strong>Mês no filtro:</strong> mostra apenas meses com dados lançados para o ano selecionado.</div></section></div></section>
+  <main id="exec" class="section active">
+    <section class="cards">
+      <div class="card green">
+        <label>Faturamento operacional</label>
+        <div class="value" id="kFat">—</div>
+        <div class="small">Base do período selecionado</div>
+      </div>
+      <div class="card orange">
+        <label>Glosa operacional</label>
+        <div class="value" id="kGlosa">—</div>
+        <div class="small">Percentual: <strong id="kGlosaPct">—</strong></div>
+      </div>
+      <div class="card">
+        <label>Média de faltas</label>
+        <div class="value" id="kFaltasMedia">—</div>
+        <div class="small">Média das faltas no recorte filtrado</div>
+      </div>
+      <div class="card">
+        <label>Valor dia contratual</label>
+        <div class="value" id="kValorDia">—</div>
+        <div class="small">Média do campo contratual informado</div>
+      </div>
+      <div class="card">
+        <label>Faturamento YTD</label>
+        <div class="value" id="kFatYtd">—</div>
+        <div class="small">Acumulado no ano até o mês</div>
+      </div>
+      <div class="card red">
+        <label>Glosa YTD</label>
+        <div class="value" id="kGlosaYtd">—</div>
+        <div class="small">Percentual YTD: <strong id="kGlosaYtdPct">—</strong></div>
+      </div>
+    </section>
+
+    <section class="reading">
+      <div class="icon">!</div>
+      <div>
+        <h3>Leitura executiva</h3>
+        <p id="leitura">—</p>
+      </div>
+    </section>
+
+    <section class="grid">
+      <div class="panel">
+        <h2>Top 3 unidades com maior glosa</h2>
+        <table>
+          <thead><tr><th>#</th><th>Unidade</th><th>Glosa</th><th>Part.</th></tr></thead>
+          <tbody id="top3"></tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>Comparativos</h2>
+        <table>
+          <tbody>
+            <tr><th>Fat. mês anterior</th><td id="cFatAnt">—</td></tr>
+            <tr><th>Variação mensal</th><td id="cVar">—</td></tr>
+            <tr><th>Fat. mesmo mês ano anterior</th><td id="cFatYoy">—</td></tr>
+            <tr><th>Status tolerância</th><td><span class="pill" id="cStatus">—</span></td></tr>
+            <tr><th>Linhas no filtro</th><td id="cLinhas">—</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel">
+        <h2>Resumo para reunião</h2>
+        <div class="note" id="resumo">—</div>
+      </div>
+    </section>
+
+    <section class="grid two">
+      <div class="panel">
+        <h2>Evolução mensal</h2>
+        <div class="chart" id="chartMes"></div>
+      </div>
+      <div class="panel">
+        <h2>Radar de decisão</h2>
+        <table><tbody id="radar"></tbody></table>
+      </div>
+    </section>
+  </main>
+
+  <main id="ana" class="section">
+    <section class="grid two">
+      <div class="panel">
+        <h2>Tabela analítica por unidade</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Unidade</th>
+              <th>Contratado</th>
+              <th>Faturamento</th>
+              <th>Glosa</th>
+              <th>% Glosa</th>
+              <th>Média faltas</th>
+            </tr>
+          </thead>
+          <tbody id="tblUnidades"></tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h2>Distribuição por unidade</h2>
+        <div class="chart" id="chartUnidades"></div>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:16px">
+      <h2>Mapa de calor mensal por unidade — % glosa</h2>
+      <div class="heatwrap">
+        <table class="heatmap" id="heatmap"></table>
+      </div>
+    </section>
+  </main>
+
+  <main id="gov" class="section">
+    <section class="grid">
+      <div class="panel">
+        <h2>Parâmetros</h2>
+        <table><tbody id="params"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Validação</h2>
+        <table><tbody id="validacao"></tbody></table>
+      </div>
+      <div class="panel">
+        <h2>Metodologia</h2>
+        <div class="note">
+          <strong>Visão executiva corrigida:</strong> usa Fat_Operacional_Corrigido e Glosa_Corrigida quando existirem.<br><br>
+          <strong>Visão técnica original:</strong> usa Fat_Operacional e Glosa_Operacional.<br><br>
+          <strong>% Glosa:</strong> Glosa ÷ Faturamento operacional.<br><br>
+          <strong>Média de faltas:</strong> média das faltas reais nas linhas filtradas.<br><br>
+          <strong>Filtro de mês:</strong> mostra apenas meses com dados lançados no ano selecionado.
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer">Painel HTML estático · leitura dinâmica via CSV publicado do Google Sheets</div>
 </div>
+
 <script>
-const CSV_URLS = {
-  metadata: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0-undSwnhvoYVlsai1Oxh-JM4hp5X6XNaTZ7moGk-n28GosePFiKIRYmKOdk63yPnIKoE8a98DDCI/pub?gid=1455579549&single=true&output=csv',
-  fato:     'https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0-undSwnhvoYVlsai1Oxh-JM4hp5X6XNaTZ7moGk-n28GosePFiKIRYmKOdk63yPnIKoE8a98DDCI/pub?gid=1676171364&single=true&output=csv'
-};
-const CONFIG={titulo:'Painel Executivo SME · Limpeza',subtitulo:'Visão executiva e analítica · Dados dinâmicos Google Sheets',metaGlosa:0.03,alertaGlosa:0.035};
-let DADOS=[];let META={};
-const MESES=['','Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
-const MESES3=['','Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-const brl=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});
-const brl2=v=>Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL',minimumFractionDigits:2,maximumFractionDigits:2});
-const pct=v=>Number(v||0).toLocaleString('pt-BR',{style:'percent',minimumFractionDigits:1,maximumFractionDigits:1});
-const num=v=>Number(v||0).toLocaleString('pt-BR',{maximumFractionDigits:1});
-function toN(v){if(v==null||v===''||v==='-'||v==='N/A')return 0;let s=String(v).trim().replace(/R\$/g,'').replace(/\s/g,'');if(s.includes(',')&&s.includes('.'))s=s.replace(/\./g,'').replace(',','.');else if(s.includes(','))s=s.replace(',','.');const n=parseFloat(s);return Number.isFinite(n)?n:0}
-function getAny(r,campos){for(const c of campos){if(r[c]!=null&&r[c]!=='')return r[c]}return ''}
-function getFat(r){return getAny(r,['fat','Fat_Operacional_Corrigido','Fat_Operacional','Faturamento_Operacional'])}
-function getGlosa(r){return getAny(r,['glosa','Glosa_Corrigida','Glosa_Operacional'])}
-function getMes(r){return Number(getAny(r,['mes','Mês_Num','Mes_Num','Mês_Realizado','Mes_Realizado']))||0}
-function getAno(r){return Number(getAny(r,['ano','Ano']))||0}
-function getUnidade(r){return String(getAny(r,['unidade','Unidade'])||'')}
-function soma(arr,campoFn){return arr.reduce((s,r)=>s+toN(campoFn(r)),0)}
-async function fetchCsv(url){const resp=await fetch(url,{cache:'no-store'});if(!resp.ok)throw new Error('Erro HTTP '+resp.status+' no CSV');const txt=await resp.text();if(txt.includes('<html')||txt.includes('não existe'))throw new Error('O link não retornou CSV válido. Verifique publicação na web.');return Papa.parse(txt,{header:true,skipEmptyLines:true}).data}
-async function carregarDados(){try{document.getElementById('loading').style.display='block';const [meta,fato]=await Promise.all([fetchCsv(CSV_URLS.metadata),fetchCsv(CSV_URLS.fato)]);META={};meta.forEach(r=>{const k=getAny(r,['Parametro','Campo','parametro','campo']);const v=getAny(r,['Valor','valor','Fórmula','Formula']);if(k)META[k]=v});DADOS=fato.map(r=>({ano:getAno(r),mes:getMes(r),unidade:getUnidade(r),tipo:getAny(r,['Tipo_Unidade','tipo'])||'',contratado:toN(getAny(r,['Valor_Contratado','contratado'])),fatBruto:toN(getAny(r,['Faturamento_Bruto','fatBruto'])),retroativo:toN(getAny(r,['Retroativo','retroativo'])),postos:toN(getAny(r,['Postos','postos'])),fatCorrigido:toN(getAny(r,['Fat_Operacional_Corrigido','fat'])),fatOriginal:toN(getAny(r,['Fat_Operacional','Fat_Operacional_Original'])),glosaCorrigida:toN(getAny(r,['Glosa_Corrigida','glosa'])),glosaOriginal:toN(getAny(r,['Glosa_Operacional','Glosa_Operacional_Original'])),dias:toN(getAny(r,['Dias_Mês','Dias_Mes','dias'])),valorDia:toN(getAny(r,['Valor_Posto_Dia_Contratual','Valor_Dia_Real','valorDia'])),faltas:toN(getAny(r,['Faltas_Reais','faltas']))})).filter(d=>d.ano&&d.mes&&d.unidade);if(!DADOS.length)throw new Error('CSV carregado, mas sem dados válidos.');document.getElementById('loading').style.display='none';init()}catch(e){document.getElementById('loading').style.display='none';const er=document.getElementById('erro');er.style.display='block';er.textContent=e.message}}
-function fatVal(d){return fVisao.value==='original'?(d.fatOriginal||d.fatCorrigido):(d.fatCorrigido||d.fatOriginal)}
-function glosaVal(d){return fVisao.value==='original'?(d.glosaOriginal||d.glosaCorrigida):(d.glosaCorrigida||d.glosaOriginal)}
-function init(){document.getElementById('tituloPrincipal').textContent=CONFIG.titulo;document.getElementById('subtituloPrincipal').textContent=CONFIG.subtitulo;popularFiltros();aplicarFiltros()}
-function anosDisponiveis(){return [...new Set(DADOS.map(d=>d.ano))].sort((a,b)=>a-b)}
-function mesesDoAno(ano){return [...new Set(DADOS.filter(d=>d.ano==ano).map(d=>d.mes))].filter(Boolean).sort((a,b)=>a-b)}
-function popularFiltros(){const anos=anosDisponiveis();const anoMeta=Number(META.Ano_Atual)||anos[anos.length-1];fAno.innerHTML=anos.map(a=>`<option value="${a}" ${a==anoMeta?'selected':''}>${a}</option>`).join('');popularMeses();const unidades=[...new Set(DADOS.map(d=>d.unidade))].sort();fUnidade.innerHTML='<option value="Todas">Todas</option>'+unidades.map(u=>`<option>${u}</option>`).join('')}
-function popularMeses(){const ano=+fAno.value;const meses=mesesDoAno(ano);let mesMeta=Number(META.Mes_Atual)||meses[meses.length-1];if(!meses.includes(mesMeta))mesMeta=meses[meses.length-1];fMes.innerHTML=meses.map(m=>`<option value="${m}" ${m==mesMeta?'selected':''}>${MESES[m]}</option>`).join('')}
-function onAnoChange(){popularMeses();aplicarFiltros()}
-function filtrar(ano,mes,unidade){return DADOS.filter(d=>d.ano==ano&&d.mes==mes&&(unidade==='Todas'||d.unidade===unidade))}
-function filtrarAteMes(ano,mes,unidade){return DADOS.filter(d=>d.ano==ano&&d.mes<=mes&&(unidade==='Todas'||d.unidade===unidade))}
-function kpisBase(ano,mes,unidade){const atual=filtrar(ano,mes,unidade);const mesAnt=mes==1?12:mes-1;const anoAntMes=mes==1?ano-1:ano;const anterior=filtrar(anoAntMes,mesAnt,unidade);const yoy=filtrar(ano-1,mes,unidade);const ytd=filtrarAteMes(ano,mes,unidade);const fat=soma(atual,fatVal),glosa=soma(atual,glosaVal),contratado=soma(atual,d=>d.contratado),fatAnt=soma(anterior,fatVal),fatYoy=soma(yoy,fatVal),fatYtd=soma(ytd,fatVal),glosaYtd=soma(ytd,glosaVal),faltasTotal=soma(atual,d=>d.faltas),faltasMedia=atual.length?faltasTotal/atual.length:0,valorDia=valorDiaContratual(atual,ano,mes);return{atual,fat,glosa,contratado,glosaPct:fat?glosa/fat:0,fatAnt,fatYoy,mom:fatAnt?(fat-fatAnt)/fatAnt:0,yoy:fatYoy?(fat-fatYoy)/fatYoy:0,fatYtd,glosaYtd,glosaYtdPct:fatYtd?glosaYtd/fatYtd:0,faltasTotal,faltasMedia,valorDia}}
-function valorDiaContratual(rows,ano,mes){const vals=rows.map(r=>r.valorDia).filter(v=>v>0);if(vals.length)return vals.reduce((a,b)=>a+b,0)/vals.length;const pre=toN(META.Valor_Posto_Dia_Pre)||198.19;const pos=toN(META.Valor_Posto_Dia_Pos)||231.13;const reajuste=String(META.Data_Reajuste_16pct||'2025-05-01').slice(0,10);const dataRef=`${ano}-${String(mes).padStart(2,'0')}-01`;return dataRef>=reajuste?pos:pre}
-function statusGlosa(p){return p<=CONFIG.metaGlosa?'Dentro da tolerância':(p<=CONFIG.alertaGlosa?'Atenção':'Crítico')}
-function statusClass(s){return s==='Dentro da tolerância'?'green':s==='Atenção'?'orange':'red'}
-function aplicarFiltros(){const ano=+fAno.value,mes=+fMes.value,unidade=fUnidade.value;const k=kpisBase(ano,mes,unidade);chipAno.textContent=ano;chipMes.textContent=MESES[mes];chipMeta.textContent=pct(CONFIG.metaGlosa);chipAtualizacao.textContent=META.Ultima_Atualizacao||META.data_atualizacao||new Date().toLocaleString('pt-BR');fatMes.textContent=brl(k.fat);glosaMes.textContent=brl(k.glosa);glosaPctCard.textContent=pct(k.glosaPct);mom.textContent=pct(k.mom);valorDia.textContent=brl2(k.valorDia);fatYtd.textContent=brl(k.fatYtd);glosaYtd.textContent=brl(k.glosaYtd);glosaYtdPct.textContent=pct(k.glosaYtdPct);fatAnterior.textContent=brl(k.fatAnt);fatAnoAnterior.textContent=brl(k.fatYoy);glosaAtualTabela.textContent=pct(k.glosaPct);faltasMediaTabela.textContent=num(k.faltasMedia);const status=statusGlosa(k.glosaPct);statusPill.textContent=status;statusPill.className='pill '+statusClass(status);narrativa.textContent=`Faturamento operacional de ${brl(k.fat)} com glosa de ${pct(k.glosaPct)}. A média de faltas no recorte foi de ${num(k.faltasMedia)}. Variação mensal de ${pct(k.mom)}.`;renderTicker(k,status);renderTop(k);renderTrend(ano,mes,unidade);renderRadar(k,status);renderAnalitica(k);renderHeatmap(ano,unidade);renderGovernanca(k,ano,mes,status)}
-function renderTicker(k,status){const cls=status==='Crítico'?'crit':status==='Atenção'?'att':'ok';const items=[`<span class="tag ${cls}">${status}</span> Glosa atual ${pct(k.glosaPct)}`,`<span class="tag att">FAT</span> Fat. operacional ${brl(k.fat)}`,`<span class="tag ok">TOLERÂNCIA</span> ${pct(CONFIG.metaGlosa)}`,`<span class="tag att">FALTAS</span> Média ${num(k.faltasMedia)}`,`<span class="tag crit">GLOSA</span> ${brl(k.glosa)}`];tickerTrack.innerHTML=[...items,...items].map(x=>`<div class="ticker-item">${x}</div>`).join('')}
-function renderTop(k){const total=k.glosa||1;const top=[...k.atual].sort((a,b)=>glosaVal(b)-glosaVal(a)).slice(0,3);topBody.innerHTML=top.map((r,i)=>`<tr><td>${i+1}</td><td><strong>${r.unidade}</strong></td><td>${brl(glosaVal(r))}</td><td><div class="bar"><span style="width:${Math.max(5,(glosaVal(r)/total)*100)}%"></span></div><small>${pct(glosaVal(r)/total)}</small></td></tr>`).join('')||'<tr><td colspan="4">Sem dados para o filtro.</td></tr>';resumoReuniao.innerHTML=`O mês selecionado apresenta <strong>${pct(k.glosaPct)}</strong> de glosa sobre o faturamento operacional. A maior concentração está em <strong>${top[0]?.unidade||'sem unidade'}</strong>. O acumulado do ano está em <strong>${pct(k.glosaYtdPct)}</strong>.`}
-function renderTrend(ano,mesAtual,unidade){const meses=mesesDoAno(ano);const vals=meses.map(m=>kpisBase(ano,m,unidade));const ind=fGrafico.value;let arr=vals.map(v=>v[ind]||0);let max=Math.max(...arr,1);if(ind==='glosaPct')max=Math.max(CONFIG.alertaGlosa*2,...arr,0.01);graficoNota.textContent=ind==='glosaPct'?'Escala baseada em % de glosa. Meses exibidos apenas quando há dados lançados.':'Meses exibidos apenas quando há dados lançados.';trendChart.innerHTML=vals.map((v,i)=>{const m=meses[i],valor=v[ind]||0,label=ind==='glosaPct'?pct(valor):(ind==='faltasMedia'?num(valor):brl(valor));const h=Math.max(18,Math.min(valor/max,1.1)*170);const cls=m==mesAtual?'orange':(ind==='glosa'||ind==='glosaPct'?'red':'');return`<div class="col ${cls}"><div class="labelValue">${label}</div><div class="stick" style="height:${h}px"></div><small>${MESES3[m]}</small></div>`}).join('')}
-function renderRadar(k,status){radarBody.innerHTML=`<tr><th>Status</th><td>${status}</td></tr><tr><th>Média de faltas</th><td>${num(k.faltasMedia)}</td></tr><tr><th>Glosa / Fat. operacional</th><td>${pct(k.glosaPct)}</td></tr><tr><th>Valor dia contratual</th><td>${brl2(k.valorDia)}</td></tr><tr><th>Pressão anual</th><td>${k.glosaYtdPct>CONFIG.alertaGlosa?'Acompanhar YTD':'Controlada'}</td></tr>`}
-function renderAnalitica(k){const grupos={};k.atual.forEach(r=>{if(!grupos[r.unidade])grupos[r.unidade]={unidade:r.unidade,contratado:0,fat:0,glosa:0,faltas:0,qtd:0};grupos[r.unidade].contratado+=r.contratado;grupos[r.unidade].fat+=fatVal(r);grupos[r.unidade].glosa+=glosaVal(r);grupos[r.unidade].faltas+=r.faltas;grupos[r.unidade].qtd++});const linhas=Object.values(grupos).sort((a,b)=>b.glosa-a.glosa);qtdLinhas.textContent=`${linhas.length} unidades`;analiticaBody.innerHTML=linhas.map(r=>`<tr><td><strong>${r.unidade}</strong></td><td>${brl(r.contratado)}</td><td>${brl(r.fat)}</td><td>${brl(r.glosa)}</td><td>${pct(r.fat?r.glosa/r.fat:0)}</td><td>${num(r.qtd?r.faltas/r.qtd:0)}</td></tr>`).join('')||'<tr><td colspan="6">Sem dados.</td></tr>';const max=Math.max(...linhas.map(r=>r.fat?r.glosa/r.fat:0),CONFIG.alertaGlosa);distChart.innerHTML=linhas.map(r=>{const p=r.fat?r.glosa/r.fat:0;return`<div class="col ${p>CONFIG.alertaGlosa?'red':'orange'}"><div class="labelValue">${pct(p)}</div><div class="stick" style="height:${Math.max(18,(p/max)*170)}px"></div><small>${r.unidade.slice(0,6)}</small></div>`}).join('');interpretacaoAnalitica.innerHTML=`A análise detalhada permite verificar concentração por unidade, percentual de glosa e média de faltas. O filtro de unidade isola uma CRE específica e a evolução mensal respeita somente os meses efetivamente lançados.`}
-function renderHeatmap(ano,unidade){const unidades=[...new Set(DADOS.filter(d=>unidade==='Todas'||d.unidade===unidade).map(d=>d.unidade))].sort();const meses=mesesDoAno(ano);let html='<tr><th>Unidade</th>'+meses.map(m=>`<th>${MESES3[m]}</th>`).join('')+'</tr>';html+=unidades.map(u=>'<tr><td>'+u+'</td>'+meses.map(m=>{const rows=DADOS.filter(d=>d.ano==ano&&d.mes==m&&d.unidade==u);const fat=soma(rows,fatVal),gl=soma(rows,glosaVal),p=fat?gl/fat:0;const bg=p>CONFIG.alertaGlosa?'rgba(255,94,94,.45)':p>CONFIG.metaGlosa?'rgba(255,177,74,.35)':'rgba(50,213,131,.20)';return `<td style="background:${bg}">${fat?pct(p):'—'}</td>`}).join('')+'</tr>').join('');heatmapTable.innerHTML=html}
-function renderGovernanca(k,ano,mes,status){paramBody.innerHTML=`<tr><th>Tolerância glosa</th><td>${pct(CONFIG.metaGlosa)}</td></tr><tr><th>Alerta glosa</th><td>${pct(CONFIG.alertaGlosa)}</td></tr><tr><th>Ano referência</th><td>${ano}</td></tr><tr><th>Mês referência</th><td>${MESES[mes]}</td></tr><tr><th>Visão</th><td>${fVisao.value}</td></tr><tr><th>Registros carregados</th><td>${DADOS.length}</td></tr>`;validacaoBody.innerHTML=`<tr><th>Faturamento > 0</th><td>${k.fat>0?'✅ OK':'❌ Verificar'}</td></tr><tr><th>Glosa calculada</th><td>${k.glosa>=0?'✅ OK':'❌ Verificar'}</td></tr><tr><th>Status tolerância</th><td>${status}</td></tr><tr><th>Registros filtrados</th><td>${k.atual.length}</td></tr>`}
-function trocarSecao(id,btn){document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');aplicarFiltros()}
-carregarDados();
+const CSV_FATO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQ0-undSwnhvoYVlsai1Oxh-JM4hp5X6XNaTZ7moGk-n28GosePFiKIRYmKOdk63yPnIKoE8a98DDCI/pub?gid=1676171364&single=true&output=csv";
+
+const TOLERANCIA = 0.03;
+const ALERTA = 0.035;
+
+const MESES = ["","Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+const MESES3 = ["","Jan","Fev","Mar","Abr","Mai","Jun","Jul","Ago","Set","Out","Nov","Dez"];
+
+let dados = [];
+
+const $ = id => document.getElementById(id);
+const brl = v => Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL",maximumFractionDigits:0});
+const brl2 = v => Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL",minimumFractionDigits:2,maximumFractionDigits:2});
+const pct = v => Number(v||0).toLocaleString("pt-BR",{style:"percent",minimumFractionDigits:1,maximumFractionDigits:1});
+const num = v => Number(v||0).toLocaleString("pt-BR",{maximumFractionDigits:1});
+
+function normalizarNumero(v){
+  if(v === null || v === undefined || v === "" || v === "-") return 0;
+  let s = String(v).trim().replace(/R\$/g,"").replace(/\s/g,"");
+  if(s.includes(".") && s.includes(",")) s = s.replace(/\./g,"").replace(",",".");
+  else if(s.includes(",")) s = s.replace(",",".");
+  const n = Number(s);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function campo(row, nomes){
+  for(const n of nomes){
+    if(row[n] !== undefined && row[n] !== null && String(row[n]).trim() !== "") return row[n];
+  }
+  return "";
+}
+
+function mapear(row){
+  return {
+    unidade: String(campo(row,["Unidade","unidade"])).trim(),
+    ano: normalizarNumero(campo(row,["Ano","ano"])),
+    mes: normalizarNumero(campo(row,["Mês_Num","Mes_Num","Mês Realizado","Mês_Realizado","mes","Mês"])),
+    contratado: normalizarNumero(campo(row,["Valor_Contratado","contratado"])),
+    fatBruto: normalizarNumero(campo(row,["Faturamento_Bruto","fatBruto"])),
+    retroativo: normalizarNumero(campo(row,["Retroativo","retroativo"])),
+    postos: normalizarNumero(campo(row,["Postos","postos"])),
+    fatCorrigido: normalizarNumero(campo(row,["Fat_Operacional_Corrigido","fatCorrigido"])),
+    fatOriginal: normalizarNumero(campo(row,["Fat_Operacional","Fat_Operacional_Original","fatOriginal"])),
+    glosaCorrigida: normalizarNumero(campo(row,["Glosa_Corrigida","glosaCorrigida"])),
+    glosaOriginal: normalizarNumero(campo(row,["Glosa_Operacional","Glosa_Operacional_Original","glosaOriginal"])),
+    dias: normalizarNumero(campo(row,["Dias_Mês","Dias_Mes","dias"])),
+    valorDia: normalizarNumero(campo(row,["Valor_Posto_Dia_Contratual","valorDia"])),
+    faltas: normalizarNumero(campo(row,["Faltas_Reais","faltas"]))
+  };
+}
+
+function fat(row){
+  return $("fVisao").value === "original"
+    ? (row.fatOriginal || row.fatCorrigido)
+    : (row.fatCorrigido || row.fatOriginal);
+}
+
+function glosa(row){
+  return $("fVisao").value === "original"
+    ? (row.glosaOriginal || row.glosaCorrigida)
+    : (row.glosaCorrigida || row.glosaOriginal);
+}
+
+function soma(rows, fn){
+  return rows.reduce((acc,r)=> acc + Number(fn(r)||0), 0);
+}
+
+function anos(){
+  return [...new Set(dados.map(d=>d.ano))].filter(Boolean).sort((a,b)=>a-b);
+}
+
+function mesesAno(ano){
+  return [...new Set(dados.filter(d=>d.ano == ano).map(d=>d.mes))]
+    .filter(m => m >= 1 && m <= 12)
+    .sort((a,b)=>a-b);
+}
+
+function unidades(){
+  return [...new Set(dados.map(d=>d.unidade).filter(Boolean))].sort();
+}
+
+function linhas(ano, mes, unidade){
+  return dados.filter(d => d.ano == ano && d.mes == mes && (unidade === "Todas" || d.unidade === unidade));
+}
+
+function linhasYtd(ano, mes, unidade){
+  return dados.filter(d => d.ano == ano && d.mes <= mes && (unidade === "Todas" || d.unidade === unidade));
+}
+
+function status(p){
+  if(p <= TOLERANCIA) return ["Dentro da tolerância","green"];
+  if(p <= ALERTA) return ["Atenção","orange"];
+  return ["Crítico","red"];
+}
+
+function kpis(ano, mes, unidade){
+  const atual = linhas(ano, mes, unidade);
+  const mesAnt = mes == 1 ? 12 : mes - 1;
+  const anoAnt = mes == 1 ? ano - 1 : ano;
+  const anterior = linhas(anoAnt, mesAnt, unidade);
+  const mesmoAnoAnterior = linhas(ano - 1, mes, unidade);
+  const ytd = linhasYtd(ano, mes, unidade);
+
+  const fatAtual = soma(atual, fat);
+  const glosaAtual = soma(atual, glosa);
+  const fatAnt = soma(anterior, fat);
+  const fatYoy = soma(mesmoAnoAnterior, fat);
+  const fatYtd = soma(ytd, fat);
+  const glosaYtd = soma(ytd, glosa);
+  const faltasTotal = soma(atual, r=>r.faltas);
+  const faltasMedia = atual.length ? faltasTotal / atual.length : 0;
+
+  const valoresDia = atual.map(r=>r.valorDia).filter(v=>v>0);
+  const valorDia = valoresDia.length ? valoresDia.reduce((a,b)=>a+b,0) / valoresDia.length : 0;
+
+  return {
+    atual,
+    fat: fatAtual,
+    glosa: glosaAtual,
+    glosaPct: fatAtual ? glosaAtual / fatAtual : 0,
+    fatAnt,
+    variacao: fatAnt ? (fatAtual - fatAnt) / fatAnt : 0,
+    fatYoy,
+    fatYtd,
+    glosaYtd,
+    glosaYtdPct: fatYtd ? glosaYtd / fatYtd : 0,
+    faltasMedia,
+    valorDia,
+    contratado: soma(atual, r=>r.contratado)
+  };
+}
+
+async function carregar(){
+  $("status").style.display = "block";
+  $("status").className = "statusbar";
+  $("status").textContent = "Carregando dados publicados do Google Sheets...";
+
+  try{
+    const resp = await fetch(CSV_FATO, {cache:"no-store"});
+    if(!resp.ok) throw new Error("Não consegui carregar o CSV. Verifique se a aba está publicada na web.");
+
+    const texto = await resp.text();
+    if(texto.toLowerCase().includes("<html")) {
+      throw new Error("O link retornou HTML, não CSV. Publique a aba correta como CSV.");
+    }
+
+    const parsed = Papa.parse(texto, {header:true, skipEmptyLines:true});
+    dados = parsed.data.map(mapear).filter(d => d.ano && d.mes && d.unidade);
+
+    if(!dados.length) throw new Error("O CSV carregou, mas não encontrei linhas válidas. Confira os nomes das colunas da base.");
+
+    $("status").style.display = "none";
+    iniciarFiltros();
+    aplicar();
+  }catch(e){
+    $("status").className = "statusbar error";
+    $("status").textContent = e.message;
+  }
+}
+
+function iniciarFiltros(){
+  const listaAnos = anos();
+  const anoAtual = listaAnos[listaAnos.length - 1];
+
+  $("fAno").innerHTML = listaAnos.map(a => `<option value="${a}" ${a==anoAtual?"selected":""}>${a}</option>`).join("");
+  $("fUnidade").innerHTML = `<option value="Todas">Todas</option>` + unidades().map(u=>`<option>${u}</option>`).join("");
+
+  $("fAno").addEventListener("change", () => {
+    popularMeses();
+    aplicar();
+  });
+  ["fMes","fUnidade","fVisao","fIndicador"].forEach(id => $(id).addEventListener("change", aplicar));
+
+  popularMeses();
+}
+
+function popularMeses(){
+  const ano = Number($("fAno").value);
+  const ms = mesesAno(ano);
+  const ultimo = ms[ms.length - 1];
+  $("fMes").innerHTML = ms.map(m => `<option value="${m}" ${m==ultimo?"selected":""}>${MESES[m]}</option>`).join("");
+}
+
+function aplicar(){
+  const ano = Number($("fAno").value);
+  const mes = Number($("fMes").value);
+  const unidade = $("fUnidade").value;
+  const k = kpis(ano, mes, unidade);
+  const [st, cls] = status(k.glosaPct);
+
+  $("bAno").textContent = ano;
+  $("bMes").textContent = MESES[mes] || "—";
+  $("bTol").textContent = pct(TOLERANCIA);
+  $("bRegs").textContent = dados.length;
+
+  $("kFat").textContent = brl(k.fat);
+  $("kGlosa").textContent = brl(k.glosa);
+  $("kGlosaPct").textContent = pct(k.glosaPct);
+  $("kFaltasMedia").textContent = num(k.faltasMedia);
+  $("kValorDia").textContent = k.valorDia ? brl2(k.valorDia) : "—";
+  $("kFatYtd").textContent = brl(k.fatYtd);
+  $("kGlosaYtd").textContent = brl(k.glosaYtd);
+  $("kGlosaYtdPct").textContent = pct(k.glosaYtdPct);
+
+  $("cFatAnt").textContent = brl(k.fatAnt);
+  $("cVar").textContent = pct(k.variacao);
+  $("cFatYoy").textContent = brl(k.fatYoy);
+  $("cLinhas").textContent = k.atual.length;
+  $("cStatus").textContent = st;
+  $("cStatus").className = "pill " + cls;
+
+  $("leitura").textContent =
+    `No recorte selecionado, o faturamento operacional foi de ${brl(k.fat)}, com glosa de ${brl(k.glosa)} (${pct(k.glosaPct)}). ` +
+    `A média de faltas foi ${num(k.faltasMedia)} e o status frente à tolerância de ${pct(TOLERANCIA)} é: ${st}.`;
+
+  renderTop3(k);
+  renderResumo(k, st);
+  renderMensal(ano, unidade);
+  renderRadar(k, st);
+  renderUnidades(k);
+  renderHeatmap(ano, unidade);
+  renderGovernanca(k, ano, mes, st);
+}
+
+function agruparUnidades(rows){
+  const map = {};
+  rows.forEach(r=>{
+    if(!map[r.unidade]) map[r.unidade] = {unidade:r.unidade, contratado:0, fat:0, glosa:0, faltas:0, qtd:0};
+    map[r.unidade].contratado += r.contratado;
+    map[r.unidade].fat += fat(r);
+    map[r.unidade].glosa += glosa(r);
+    map[r.unidade].faltas += r.faltas;
+    map[r.unidade].qtd += 1;
+  });
+  return Object.values(map);
+}
+
+function renderTop3(k){
+  const total = k.glosa || 1;
+  const top = agruparUnidades(k.atual).sort((a,b)=>b.glosa-a.glosa).slice(0,3);
+  $("top3").innerHTML = top.map((r,i)=>{
+    const part = r.glosa / total;
+    return `<tr>
+      <td>${i+1}</td>
+      <td><strong>${r.unidade}</strong></td>
+      <td>${brl(r.glosa)}</td>
+      <td><div class="bar"><span style="width:${Math.max(4,part*100)}%"></span></div><small>${pct(part)}</small></td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="4">Sem dados.</td></tr>`;
+}
+
+function renderResumo(k, st){
+  const top = agruparUnidades(k.atual).sort((a,b)=>b.glosa-a.glosa)[0];
+  $("resumo").innerHTML =
+    `• <strong>Status:</strong> ${st}.<br>` +
+    `• <strong>Glosa do mês:</strong> ${pct(k.glosaPct)} sobre o faturamento operacional.<br>` +
+    `• <strong>Maior concentração:</strong> ${top ? top.unidade + " com " + brl(top.glosa) : "sem dados"}.<br>` +
+    `• <strong>Acumulado anual:</strong> ${brl(k.glosaYtd)} de glosa, equivalente a ${pct(k.glosaYtdPct)} do faturamento YTD.`;
+}
+
+function renderMensal(ano, unidade){
+  const ms = mesesAno(ano);
+  const indicador = $("fIndicador").value;
+  const vals = ms.map(m => ({m, k:kpis(ano,m,unidade)}));
+  const arr = vals.map(x => x.k[indicador] || 0);
+  const max = Math.max(...arr, indicador==="glosaPct" ? ALERTA*2 : 1);
+
+  $("chartMes").innerHTML = vals.map(x=>{
+    const v = x.k[indicador] || 0;
+    const h = Math.max(18, Math.min(v/max,1.05) * 180);
+    const label = indicador==="glosaPct" ? pct(v) : indicador==="faltasMedia" ? num(v) : brl(v);
+    const classe = indicador.includes("glosa") ? "red" : indicador==="faltasMedia" ? "orange" : "";
+    return `<div class="col ${classe}">
+      <div class="lab">${label}</div>
+      <div class="stick" style="height:${h}px"></div>
+      <small>${MESES3[x.m]}</small>
+    </div>`;
+  }).join("");
+}
+
+function renderRadar(k, st){
+  $("radar").innerHTML =
+    `<tr><th>Status geral</th><td>${st}</td></tr>
+     <tr><th>% glosa mês</th><td>${pct(k.glosaPct)}</td></tr>
+     <tr><th>% glosa YTD</th><td>${pct(k.glosaYtdPct)}</td></tr>
+     <tr><th>Média faltas</th><td>${num(k.faltasMedia)}</td></tr>
+     <tr><th>Ação sugerida</th><td>${k.glosaPct > ALERTA ? "Priorizar unidades críticas e validar causas da glosa." : "Manter acompanhamento mensal."}</td></tr>`;
+}
+
+function renderUnidades(k){
+  const linhas = agruparUnidades(k.atual).sort((a,b)=>b.glosa-a.glosa);
+  $("tblUnidades").innerHTML = linhas.map(r=>{
+    const p = r.fat ? r.glosa/r.fat : 0;
+    return `<tr>
+      <td><strong>${r.unidade}</strong></td>
+      <td>${brl(r.contratado)}</td>
+      <td>${brl(r.fat)}</td>
+      <td>${brl(r.glosa)}</td>
+      <td>${pct(p)}</td>
+      <td>${num(r.qtd ? r.faltas/r.qtd : 0)}</td>
+    </tr>`;
+  }).join("") || `<tr><td colspan="6">Sem dados.</td></tr>`;
+
+  const max = Math.max(...linhas.map(r => r.fat ? r.glosa/r.fat : 0), ALERTA);
+  $("chartUnidades").innerHTML = linhas.slice(0,12).map(r=>{
+    const p = r.fat ? r.glosa/r.fat : 0;
+    const h = Math.max(18, Math.min(p/max,1.05) * 180);
+    return `<div class="col ${p>ALERTA?'red':'orange'}">
+      <div class="lab">${pct(p)}</div>
+      <div class="stick" style="height:${h}px"></div>
+      <small>${r.unidade.slice(0,7)}</small>
+    </div>`;
+  }).join("");
+}
+
+function renderHeatmap(ano, unidadeFiltro){
+  const ms = mesesAno(ano);
+  const us = unidades().filter(u => unidadeFiltro === "Todas" || u === unidadeFiltro);
+  let html = `<tr><th>Unidade</th>${ms.map(m=>`<th>${MESES3[m]}</th>`).join("")}</tr>`;
+
+  html += us.map(u=>{
+    return `<tr><td>${u}</td>` + ms.map(m=>{
+      const rows = linhas(ano,m,u);
+      const f = soma(rows, fat);
+      const g = soma(rows, glosa);
+      const p = f ? g/f : 0;
+      const bg = p > ALERTA ? "rgba(255,92,92,.42)" : p > TOLERANCIA ? "rgba(255,159,67,.35)" : "rgba(50,213,131,.22)";
+      return `<td style="background:${bg}">${f ? pct(p) : "—"}</td>`;
+    }).join("") + `</tr>`;
+  }).join("");
+
+  $("heatmap").innerHTML = html;
+}
+
+function renderGovernanca(k, ano, mes, st){
+  $("params").innerHTML =
+    `<tr><th>Tolerância</th><td>${pct(TOLERANCIA)}</td></tr>
+     <tr><th>Alerta</th><td>${pct(ALERTA)}</td></tr>
+     <tr><th>Ano</th><td>${ano}</td></tr>
+     <tr><th>Mês</th><td>${MESES[mes]}</td></tr>
+     <tr><th>Visão</th><td>${$("fVisao").value}</td></tr>
+     <tr><th>Total de registros</th><td>${dados.length}</td></tr>`;
+
+  $("validacao").innerHTML =
+    `<tr><th>Linhas filtradas</th><td>${k.atual.length}</td></tr>
+     <tr><th>Faturamento > 0</th><td>${k.fat > 0 ? "OK" : "Verificar"}</td></tr>
+     <tr><th>Glosa calculada</th><td>${k.glosa >= 0 ? "OK" : "Verificar"}</td></tr>
+     <tr><th>Status</th><td>${st}</td></tr>`;
+}
+
+function secao(id, btn){
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"));
+  $(id).classList.add("active");
+  btn.classList.add("active");
+  aplicar();
+}
+
+carregar();
 </script>
 </body>
 </html>
